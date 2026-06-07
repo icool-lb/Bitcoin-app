@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#f5f7fb"/>
-<title>BTC Pro Liquidity Engine V9 — Hybrid Pro</title>
+<title>BTC Pro Liquidity Engine V9.1 — Meta Safe</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -110,6 +110,21 @@ button,input,select{font-family:inherit}
   .panelBtn{font-size:10px}
 }
 
+
+/* V9.1 MetaAPI safe mode */
+.tfMiniBar{display:flex;gap:5px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px;box-shadow:0 6px 18px rgba(15,23,42,.04)}
+.tfBtn{border:0;border-radius:10px;background:transparent;color:var(--muted);font-family:'JetBrains Mono';font-size:11px;font-weight:900;padding:7px 8px;cursor:pointer}
+.tfBtn.active{background:linear-gradient(145deg,rgba(245,158,11,.16),rgba(8,145,178,.08));color:#8a5600;border:1px solid rgba(183,121,0,.18)}
+.apiStatus{height:42px;display:flex;align-items:center;gap:7px;border-radius:14px;padding:0 12px;border:1px solid var(--line);background:#fff;font-size:11px;font-weight:900;color:var(--muted);box-shadow:0 6px 18px rgba(15,23,42,.04)}
+.apiStatus:before{content:"";width:9px;height:9px;border-radius:50%;background:var(--dim);box-shadow:0 0 10px rgba(148,163,184,.5)}
+.apiStatus.ok{color:var(--green);border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.05)}.apiStatus.ok:before{background:var(--green);box-shadow:0 0 12px rgba(22,163,74,.6)}
+.apiStatus.err{color:var(--red);border-color:rgba(220,38,38,.28);background:rgba(220,38,38,.06)}.apiStatus.err:before{background:var(--red);box-shadow:0 0 12px rgba(220,38,38,.55)}
+.apiStatus.warn{color:var(--orange);border-color:rgba(245,158,11,.30);background:rgba(245,158,11,.07)}.apiStatus.warn:before{background:var(--orange);box-shadow:0 0 12px rgba(245,158,11,.55)}
+.dataBanner{position:absolute;left:16px;right:16px;top:14px;z-index:12;border-radius:14px;padding:12px 14px;border:1px solid rgba(220,38,38,.30);background:rgba(255,255,255,.96);box-shadow:var(--shadow2);display:none;align-items:flex-start;gap:10px;color:#7f1d1d;font-size:12px;line-height:1.6}
+.dataBanner.show{display:flex}.dataBanner b{display:block;font-size:13px;color:var(--red)}.dataBanner .warnIcon{font-size:22px;line-height:1}
+.tradingLocked #chart{filter:grayscale(.15) opacity(.55)}.tradingLocked .chartWrap:after{content:"TRADING DISABLED — METAAPI DATA ERROR";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:'JetBrains Mono';font-weight:900;font-size:15px;color:rgba(220,38,38,.65);letter-spacing:.7px;pointer-events:none}
+@media(max-width:980px){.tfMiniBar{justify-content:center;flex-wrap:wrap}.apiStatus{justify-content:center}}
+
 </style>
 </head>
 <body>
@@ -117,11 +132,19 @@ button,input,select{font-family:inherit}
   <header class="topbar">
     <div class="brand">
       <div class="logo">₿</div>
-      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9</span></h1><p>Clean Chart + Full Intelligence Panels</p></div>
+      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9.1</span></h1><p>MetaAPI Safe Mode • No Demo Fallback</p></div>
     </div>
     <div class="selectorRow">
       <div class="selectPill"><span class="btcMini">₿</span><span id="symHead">BTCUSD</span>⌄</div>
-      <div class="selectPill"><span id="tfHead">M15</span>⌄</div>
+      <div class="tfMiniBar" id="tfMiniBar">
+        <button class="tfBtn" data-tf="M5">M5</button>
+        <button class="tfBtn active" data-tf="M15">M15</button>
+        <button class="tfBtn" data-tf="M30">M30</button>
+        <button class="tfBtn" data-tf="H1">H1</button>
+        <button class="tfBtn" data-tf="H4">H4</button>
+        <button class="tfBtn" data-tf="D1">D1</button>
+      </div>
+      <div class="apiStatus warn" id="apiStatus">METAAPI CHECKING</div>
     </div>
     <div class="priceBox">
       <div class="priceLbl">السعر الحالي</div>
@@ -142,6 +165,7 @@ button,input,select{font-family:inherit}
         <div class="chartStatus"><span>TF: <b id="tfBadge">M15</b></span><span class="statusPill">Candles: <span id="candleCount">---</span></span></div>
       </div>
       <div class="chartWrap" id="chartArea">
+        <div class="dataBanner" id="dataBanner"><span class="warnIcon">⚠️</span><div><b>MetaAPI غير متصل — التداول مقفل</b><span id="dataErrorText">لا توجد بيانات حقيقية. لن يتم تشغيل Demo حتى لا تتداول على سعر خاطئ.</span></div></div>
         <canvas id="chart"></canvas>
         <div class="selectionBox" id="selectionBox"></div>
         <div class="cross v" id="crossV"></div><div class="cross h" id="crossH"></div><div class="tooltip" id="tip"></div>
@@ -298,7 +322,7 @@ const TF_MAP={M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'4h',D1:'1d'};
 const LIMIT=500;
 let symbol=localStorage.getItem('btc_meta_symbol')||'BTCUSD';
 let metaEndpoint=localStorage.getItem('btc_meta_endpoint')||'/api/metaapi-candles';
-let currentTF='M15', candles=[], tfCache={}, analysis=null, tradeSetup=null;
+let currentTF='M15', candles=[], tfCache={}, analysis=null, tradeSetup=null, dataStatus='checking', dataError='', lastGoodAt=null;
 let viewCount=150, viewOffset=0, alertEnabled=false, lastAlertKey='', lastAlertTime=0;
 let autoFocus=false, boxZoomMode=false, selectState=null, chartGeom=null;
 const $=id=>document.getElementById(id);
@@ -308,13 +332,45 @@ const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
 function normalizeCandle(k){if(Array.isArray(k)) return {t:+k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+(k[5]||0)}; const t=k.time?new Date(k.time).getTime():(k.brokerTime?new Date(k.brokerTime.replace(' ','T')+'Z').getTime():Date.now()); return {t,o:+k.open,h:+k.high,l:+k.low,c:+k.close,v:+(k.tickVolume??k.volume??0)};}
 async function fetchCandles(tf){
-  const timeframe=TF_MAP[tf]||'15m';const sep=metaEndpoint.includes('?')?'&':'?';const url=`${metaEndpoint}${sep}symbol=${encodeURIComponent(symbol)}&timeframe=${encodeURIComponent(timeframe)}&limit=${LIMIT}`;
-  try{const r=await fetch(url,{cache:'no-store'});const payload=await r.json().catch(()=>null);if(!r.ok)throw new Error((payload&&payload.error)||('HTTP '+r.status));const data=Array.isArray(payload)?payload:(payload.candles||payload.data||[]);const out=data.map(normalizeCandle).filter(x=>Number.isFinite(x.o)&&Number.isFinite(x.h)&&Number.isFinite(x.l)&&Number.isFinite(x.c));if(!out.length)throw new Error('No candles');return out.sort((a,b)=>a.t-b.t);}
-  catch(e){console.warn(e);return demoCandles(tf);}
+  const timeframe=TF_MAP[tf]||'15m';
+  const sep=metaEndpoint.includes('?')?'&':'?';
+  const url=`${metaEndpoint}${sep}symbol=${encodeURIComponent(symbol)}&timeframe=${encodeURIComponent(timeframe)}&limit=${LIMIT}`;
+  const r=await fetch(url,{cache:'no-store'});
+  const payload=await r.json().catch(()=>null);
+  if(!r.ok){
+    const detail=payload?.detail?.message||payload?.detail?.error||payload?.error||payload?.message||('HTTP '+r.status);
+    throw new Error(`MetaAPI ${r.status}: ${detail}`);
+  }
+  const data=Array.isArray(payload)?payload:(payload?.candles||payload?.data||[]);
+  const out=data.map(normalizeCandle).filter(x=>Number.isFinite(x.o)&&Number.isFinite(x.h)&&Number.isFinite(x.l)&&Number.isFinite(x.c));
+  if(!out.length)throw new Error('MetaAPI returned zero candles');
+  return out.sort((a,b)=>a.t-b.t);
 }
-function demoCandles(tf){const ms={M5:300000,M15:900000,M30:1800000,H1:3600000,H4:14400000,D1:86400000}[tf]||900000;let out=[],p=62000,now=Date.now()-LIMIT*ms;for(let i=0;i<LIMIT;i++){const drift=Math.sin(i/23)*35+Math.sin(i/70)*80,shock=(Math.random()-.48)*220,o=p,c=p+drift*.08+shock,h=Math.max(o,c)+Math.random()*160,l=Math.min(o,c)-Math.random()*160,v=100+Math.random()*900+(Math.abs(c-o)>140?700:0);out.push({t:now+i*ms,o,h,l,c,v});p=c;}return out;}
-async function loadTF(tf,force=false){if(!force&&tfCache[tf]){candles=tfCache[tf];updateAll();return;}candles=await fetchCandles(tf);tfCache[tf]=candles;updateAll();}
-async function refreshAll(){tfCache={};await Promise.all(['D1','H4','H1','M15',currentTF].map(async tf=>{tfCache[tf]=await fetchCandles(tf)}));candles=tfCache[currentTF];updateAll();}
+async function loadTF(tf,force=false){
+  currentTF=tf; setActiveTF(tf); setDataStatus('checking','جاري تحميل بيانات MetaAPI...');
+  if(!force&&tfCache[tf]){candles=tfCache[tf];setDataStatus('ok');updateAll();return;}
+  try{
+    const fresh=await fetchCandles(tf);
+    tfCache[tf]=fresh;candles=fresh;setDataStatus('ok');updateAll();
+  }catch(e){
+    console.error(e);
+    candles=[];analysis=null;tradeSetup=null;
+    setDataStatus('err',e.message||String(e));
+    renderNoData();
+  }
+}
+async function refreshAll(){
+  setDataStatus('checking','جاري اختبار الاتصال ببيانات MetaAPI...');
+  const frames=['D1','H4','H1','M15',currentTF];
+  const results=await Promise.allSettled(frames.map(tf=>fetchCandles(tf).then(data=>({tf,data}))));
+  let currentOk=false, firstErr='';
+  results.forEach(r=>{
+    if(r.status==='fulfilled'){tfCache[r.value.tf]=r.value.data;if(r.value.tf===currentTF){candles=r.value.data;currentOk=true;}}
+    else if(!firstErr){firstErr=r.reason?.message||String(r.reason);}
+  });
+  if(currentOk){setDataStatus('ok');updateAll();}
+  else{candles=[];analysis=null;tradeSetup=null;setDataStatus('err',firstErr||'MetaAPI failed');renderNoData();}
+}
 function ema(values,p){let k=2/(p+1),out=[],prev=values[0];for(let i=0;i<values.length;i++){prev=i===0?values[i]:values[i]*k+prev*(1-k);out.push(prev)}return out}
 function calcATR(cs,p=14){let tr=[];for(let i=0;i<cs.length;i++){tr.push(i===0?cs[i].h-cs[i].l:Math.max(cs[i].h-cs[i].l,Math.abs(cs[i].h-cs[i-1].c),Math.abs(cs[i].l-cs[i-1].c)))}return ema(tr,p)}
 function calcRSI(cs,p=14){let out=new Array(cs.length).fill(50),g=0,l=0;for(let i=1;i<cs.length;i++){let d=cs[i].c-cs[i-1].c;if(i<=p){if(d>=0)g+=d;else l-=d;if(i===p){g/=p;l/=p;out[i]=100-100/(1+g/(l||1e-9))}}else{g=(g*(p-1)+Math.max(d,0))/p;l=(l*(p-1)+Math.max(-d,0))/p;out[i]=100-100/(1+g/(l||1e-9))}}return out}
@@ -330,6 +386,23 @@ function analyze(cs){if(cs.length<60)return null;const closes=cs.map(x=>x.c),vol
 function zoneScore(kind,low,high,touches=0){const p=analysis?.last?.c??((low+high)/2),atr=Math.max(1,analysis?.atrLast||1),mid=(low+high)/2,dist=Math.abs(mid-p)/atr;let s=dist<.55?96:dist<1?84:dist<1.8?68:dist<3?50:34;s+=Math.min(10,(touches||0)*3);if(kind.includes('Liquidity'))s+=4;return clamp(Math.round(s),18,100)}
 function collectZones(){if(!analysis)return[];const out=[];analysis.levels.res.slice(0,5).forEach((z,i)=>out.push({kind:'مقاومة رئيسية',code:`R${i+1}`,low:z.lower,high:z.upper,price:z.price,score:zoneScore('Resistance',z.lower,z.upper,z.touches),class:'red',action:'منطقة بيع قوية، احتمال ارتداد عالٍ'}));analysis.levels.sup.slice(0,5).forEach((z,i)=>out.push({kind:'دعم رئيسي',code:`S${i+1}`,low:z.lower,high:z.upper,price:z.price,score:zoneScore('Support',z.lower,z.upper,z.touches),class:'green',action:'منطقة شراء قوية، انتظر رفض السعر'}));analysis.fvg.slice(-8).forEach(g=>out.push({kind:'فجوة قيمة',code:g.type==='BULL'?'Bull FVG':'Bear FVG',low:g.from,high:g.to,price:g.mid,score:zoneScore('FVG',g.from,g.to,0),class:g.type==='BULL'?'green':'orange',action:'منطقة توازن محتملة، راقب رد فعل السعر'}));analysis.ob.slice(-6).forEach(o=>out.push({kind:o.type==='DEMAND'?'Demand OB':'Supply OB',code:o.type==='DEMAND'?'D-OB':'S-OB',low:o.from,high:o.to,price:(o.from+o.to)/2,score:zoneScore('OB',o.from,o.to,0),class:o.type==='DEMAND'?'green':'red',action:'Order Block مهم عند التوافق مع السيولة'}));analysis.liq.slice(0,6).forEach(l=>out.push({kind:'سيولة',code:l.type,low:l.price,high:l.price,price:l.price,score:zoneScore('Liquidity',l.price,l.price,l.points||0),class:'orange',action:'قد يسحبها السعر قبل الانعكاس'}));return out.sort((a,b)=>b.score-a.score)}
 
+
+function setActiveTF(tf){
+  document.querySelectorAll('.tfBtn').forEach(b=>b.classList.toggle('active',b.dataset.tf===tf));
+  if($('tfHead'))$('tfHead').textContent=tf;
+}
+function setDataStatus(status,msg=''){
+  dataStatus=status;dataError=msg||'';const el=$('apiStatus'),banner=$('dataBanner'),err=$('dataErrorText'),root=$('centerPanel');
+  if(el){el.className='apiStatus '+(status==='ok'?'ok':status==='err'?'err':'warn');el.textContent=status==='ok'?'METAAPI LIVE':status==='err'?'METAAPI ERROR':'METAAPI CHECKING';}
+  if(banner){banner.classList.toggle('show',status==='err');}
+  if(err&&msg)err.textContent=msg+'. لا يوجد Demo fallback في هذه النسخة.';
+  if(root)root.classList.toggle('tradingLocked',status==='err');
+  if(status==='ok')lastGoodAt=new Date();
+}
+function renderNoData(){
+  const cv=$('chart');if(!cv)return;const rect=cv.parentElement.getBoundingClientRect(),ratio=window.devicePixelRatio||1;cv.width=rect.width*ratio;cv.height=rect.height*ratio;cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';const ctx=cv.getContext('2d');ctx.scale(ratio,ratio);ctx.clearRect(0,0,rect.width,rect.height);ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,rect.width,rect.height);ctx.fillStyle='rgba(220,38,38,.72)';ctx.font='700 18px Cairo';ctx.textAlign='center';ctx.fillText('MetaAPI غير متصل — لا توجد بيانات حقيقية',rect.width/2,rect.height/2-10);ctx.font='12px JetBrains Mono';ctx.fillText('Check /api/metaapi-candles and Vercel environment variables',rect.width/2,rect.height/2+20);
+  if($('livePrice'))$('livePrice').textContent='NO DATA'; if($('priceSub'))$('priceSub').textContent='MetaAPI ERROR'; if($('decision'))$('decision').textContent='LOCKED'; if($('confidence'))$('confidence').textContent='--%';
+}
 function setPanel(name){
   document.querySelectorAll('.panelPage').forEach(p=>p.classList.toggle('active',p.id===`panel-${name}`));
   document.querySelectorAll('.panelBtn').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));
@@ -386,7 +459,7 @@ function updatePanels(){if(!analysis)return;const a=analysis,t=tradeSetup,zones=
   $('priorityCards').innerHTML=zones.slice(0,5).map((z,i)=>`<div class="prioCard ${z.class}"><div class="num">${i+1}</div><div class="prioMain"><b>${z.kind}</b><div class="price">${z.code} ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}</div><p>${z.action}</p></div><div class="score">${z.score}</div></div>`).join('');
   updateFullZones(zones); updateQuickFilter(a); updateMTF(); if($('tradeNarrative'))$('tradeNarrative').innerHTML=tradeNarrative(a,t);
 }
-function updateAll(){analysis=analyze(candles);if(!analysis)return;tradeSetup=makeTradeSetup(analysis);updatePanels();draw();checkSmartAlerts();}
+function updateAll(){if(dataStatus!=='ok'||!candles.length){renderNoData();return;}analysis=analyze(candles);if(!analysis){setDataStatus('err','Not enough valid MetaAPI candles');renderNoData();return;}tradeSetup=makeTradeSetup(analysis);updatePanels();draw();checkSmartAlerts();}
 function resetView(){viewOffset=0;viewCount=150;draw()}
 function zoomIn(){viewCount=clamp(viewCount-20,40,280);draw()}
 function zoomOut(){viewCount=clamp(viewCount+20,40,280);draw()}
@@ -420,7 +493,7 @@ function showCross(x,ypos){if(!analysis)return;$('crossV').style.display=$('cros
 function enableAlerts(){alertEnabled=true;localStorage.setItem('btc_alerts','1');if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();speakArabic('تم تفعيل تنبيهات البيتكوين الصوتية بالعربية')}
 function speakArabic(text){try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.92;u.pitch=1;u.volume=1;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 function checkSmartAlerts(){}
-function start(){if($('symbolInput'))$('symbolInput').value=symbol;if($('endpointInput'))$('endpointInput').value=metaEndpoint;setupBoxZoom();$('chartArea').addEventListener('mousemove',e=>{if(selectState)return;const r=$('chartArea').getBoundingClientRect();showCross(e.clientX-r.left,e.clientY-r.top)});$('chartArea').addEventListener('mouseleave',()=>{$('crossV').style.display=$('crossH').style.display=$('tip').style.display='none'});$('chartArea').addEventListener('wheel',e=>{e.preventDefault();e.deltaY<0?zoomIn():zoomOut()},{passive:false});refreshAll();setInterval(()=>loadTF(currentTF,true),15000)}
+function start(){if($('symbolInput'))$('symbolInput').value=symbol;if($('endpointInput'))$('endpointInput').value=metaEndpoint;setActiveTF(currentTF);document.querySelectorAll('.tfBtn').forEach(b=>b.addEventListener('click',()=>loadTF(b.dataset.tf,true)));setupBoxZoom();$('chartArea').addEventListener('mousemove',e=>{if(selectState)return;const r=$('chartArea').getBoundingClientRect();showCross(e.clientX-r.left,e.clientY-r.top)});$('chartArea').addEventListener('mouseleave',()=>{$('crossV').style.display=$('crossH').style.display=$('tip').style.display='none'});$('chartArea').addEventListener('wheel',e=>{e.preventDefault();e.deltaY<0?zoomIn():zoomOut()},{passive:false});refreshAll();setInterval(()=>loadTF(currentTF,true),15000)}
 start();
 </script>
 </body>
