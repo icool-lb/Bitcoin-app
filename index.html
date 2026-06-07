@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#f5f7fb"/>
-<title>BTC Pro Liquidity Engine V9.1 — Meta Safe</title>
+<title>BTC Pro Liquidity Engine V9.2 — Meta Safe Fix</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -132,7 +132,7 @@ button,input,select{font-family:inherit}
   <header class="topbar">
     <div class="brand">
       <div class="logo">₿</div>
-      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9.1</span></h1><p>MetaAPI Safe Mode • No Demo Fallback</p></div>
+      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9.2</span></h1><p>MetaAPI Safe Mode • No Demo • UI Fix</p></div>
     </div>
     <div class="selectorRow">
       <div class="selectPill"><span class="btcMini">₿</span><span id="symHead">BTCUSD</span>⌄</div>
@@ -348,10 +348,10 @@ async function fetchCandles(tf){
 }
 async function loadTF(tf,force=false){
   currentTF=tf; setActiveTF(tf); setDataStatus('checking','جاري تحميل بيانات MetaAPI...');
-  if(!force&&tfCache[tf]){candles=tfCache[tf];setDataStatus('ok');updateAll();return;}
+  if(!force&&tfCache[tf]){candles=tfCache[tf];setDataStatus('ok');try{updateAll();}catch(uiErr){console.error('UI update error',uiErr);setDataStatus('err','UI update error: '+(uiErr.message||uiErr));renderNoData();}return;}
   try{
     const fresh=await fetchCandles(tf);
-    tfCache[tf]=fresh;candles=fresh;setDataStatus('ok');updateAll();
+    tfCache[tf]=fresh;candles=fresh;setDataStatus('ok');try{updateAll();}catch(uiErr){console.error('UI update error',uiErr);setDataStatus('err','UI update error: '+(uiErr.message||uiErr));renderNoData();}
   }catch(e){
     console.error(e);
     candles=[];analysis=null;tradeSetup=null;
@@ -368,7 +368,7 @@ async function refreshAll(){
     if(r.status==='fulfilled'){tfCache[r.value.tf]=r.value.data;if(r.value.tf===currentTF){candles=r.value.data;currentOk=true;}}
     else if(!firstErr){firstErr=r.reason?.message||String(r.reason);}
   });
-  if(currentOk){setDataStatus('ok');updateAll();}
+  if(currentOk){setDataStatus('ok');try{updateAll();}catch(uiErr){console.error('UI update error',uiErr);setDataStatus('err','UI update error: '+(uiErr.message||uiErr));renderNoData();}}
   else{candles=[];analysis=null;tradeSetup=null;setDataStatus('err',firstErr||'MetaAPI failed');renderNoData();}
 }
 function ema(values,p){let k=2/(p+1),out=[],prev=values[0];for(let i=0;i<values.length;i++){prev=i===0?values[i]:values[i]*k+prev*(1-k);out.push(prev)}return out}
@@ -387,9 +387,10 @@ function zoneScore(kind,low,high,touches=0){const p=analysis?.last?.c??((low+hig
 function collectZones(){if(!analysis)return[];const out=[];analysis.levels.res.slice(0,5).forEach((z,i)=>out.push({kind:'مقاومة رئيسية',code:`R${i+1}`,low:z.lower,high:z.upper,price:z.price,score:zoneScore('Resistance',z.lower,z.upper,z.touches),class:'red',action:'منطقة بيع قوية، احتمال ارتداد عالٍ'}));analysis.levels.sup.slice(0,5).forEach((z,i)=>out.push({kind:'دعم رئيسي',code:`S${i+1}`,low:z.lower,high:z.upper,price:z.price,score:zoneScore('Support',z.lower,z.upper,z.touches),class:'green',action:'منطقة شراء قوية، انتظر رفض السعر'}));analysis.fvg.slice(-8).forEach(g=>out.push({kind:'فجوة قيمة',code:g.type==='BULL'?'Bull FVG':'Bear FVG',low:g.from,high:g.to,price:g.mid,score:zoneScore('FVG',g.from,g.to,0),class:g.type==='BULL'?'green':'orange',action:'منطقة توازن محتملة، راقب رد فعل السعر'}));analysis.ob.slice(-6).forEach(o=>out.push({kind:o.type==='DEMAND'?'Demand OB':'Supply OB',code:o.type==='DEMAND'?'D-OB':'S-OB',low:o.from,high:o.to,price:(o.from+o.to)/2,score:zoneScore('OB',o.from,o.to,0),class:o.type==='DEMAND'?'green':'red',action:'Order Block مهم عند التوافق مع السيولة'}));analysis.liq.slice(0,6).forEach(l=>out.push({kind:'سيولة',code:l.type,low:l.price,high:l.price,price:l.price,score:zoneScore('Liquidity',l.price,l.price,l.points||0),class:'orange',action:'قد يسحبها السعر قبل الانعكاس'}));return out.sort((a,b)=>b.score-a.score)}
 
 
+function setText(id,value){const el=$(id);if(el)el.textContent=value;}
 function setActiveTF(tf){
   document.querySelectorAll('.tfBtn').forEach(b=>b.classList.toggle('active',b.dataset.tf===tf));
-  if($('tfHead'))$('tfHead').textContent=tf;
+  setText('tfHead',tf);
 }
 function setDataStatus(status,msg=''){
   dataStatus=status;dataError=msg||'';const el=$('apiStatus'),banner=$('dataBanner'),err=$('dataErrorText'),root=$('centerPanel');
@@ -401,7 +402,7 @@ function setDataStatus(status,msg=''){
 }
 function renderNoData(){
   const cv=$('chart');if(!cv)return;const rect=cv.parentElement.getBoundingClientRect(),ratio=window.devicePixelRatio||1;cv.width=rect.width*ratio;cv.height=rect.height*ratio;cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';const ctx=cv.getContext('2d');ctx.scale(ratio,ratio);ctx.clearRect(0,0,rect.width,rect.height);ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,rect.width,rect.height);ctx.fillStyle='rgba(220,38,38,.72)';ctx.font='700 18px Cairo';ctx.textAlign='center';ctx.fillText('MetaAPI غير متصل — لا توجد بيانات حقيقية',rect.width/2,rect.height/2-10);ctx.font='12px JetBrains Mono';ctx.fillText('Check /api/metaapi-candles and Vercel environment variables',rect.width/2,rect.height/2+20);
-  if($('livePrice'))$('livePrice').textContent='NO DATA'; if($('priceSub'))$('priceSub').textContent='MetaAPI ERROR'; if($('decision'))$('decision').textContent='LOCKED'; if($('confidence'))$('confidence').textContent='--%';
+  setText('livePrice','NO DATA'); setText('priceSub','MetaAPI ERROR'); setText('decision','LOCKED'); setText('confidence','--%');
 }
 function setPanel(name){
   document.querySelectorAll('.panelPage').forEach(p=>p.classList.toggle('active',p.id===`panel-${name}`));
@@ -454,9 +455,30 @@ function tradeNarrative(a,t){
   const main=z?`${z.kind} عند ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''} بدرجة ${z.score}`:'لا توجد منطقة أولوية واضحة';
   return `القرار الحالي: <b>${a.decision}</b> بثقة <b>${a.score}%</b>. أقوى منطقة حالية: <b>${main}</b>. الخطة: Entry ${fmt(t.entry,0)}، SL ${fmt(t.sl,0)}، TP1 ${fmt(t.tp1,0)}، TP2 ${fmt(t.tp2,0)}، ونسبة R:R ${fmt(t.rr,2)}.`;
 }
-function updatePanels(){if(!analysis)return;const a=analysis,t=tradeSetup,zones=collectZones();$('livePrice').textContent=fmt(a.last.c,2)+' ▲';$('symHead').textContent=symbol;$('tfHead').textContent=currentTF;$('tfBadge').textContent=currentTF;$('candleCount').textContent=candles.length;$('priceSub').textContent=`${symbol} • ${currentTF}`;$('decision').textContent=a.decision;$('confidence').textContent=a.score+'%';$('setupEntry').textContent=fmt(t.entry,0);$('setupSL').textContent=fmt(t.sl,0);$('setupTP1').textContent=fmt(t.tp1,0);if($('setupTP2'))$('setupTP2').textContent=fmt(t.tp2,0);$('setupRR').textContent=fmt(t.rr,2);if($('targetReason'))$('targetReason').textContent=a.projected.reason||'---';
-  if($('buyersPct'))$('buyersPct').textContent=fmt(a.buyers,0)+'%'; if($('sellersPct'))$('sellersPct').textContent=fmt(a.sellers,0)+'%'; if($('sideVWAP'))$('sideVWAP').textContent=fmt(a.vwap.at(-1),1); if($('sideRSI'))$('sideRSI').textContent=fmt(a.rsi.at(-1),1); if($('sideATR'))$('sideATR').textContent=fmt(a.atrLast,1); if($('sideMood')){$('sideMood').textContent=a.mood;$('sideMood').className=a.decision==='BUY'?'green':a.decision==='SELL'?'red':'orange';}
-  $('priorityCards').innerHTML=zones.slice(0,5).map((z,i)=>`<div class="prioCard ${z.class}"><div class="num">${i+1}</div><div class="prioMain"><b>${z.kind}</b><div class="price">${z.code} ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}</div><p>${z.action}</p></div><div class="score">${z.score}</div></div>`).join('');
+function updatePanels(){
+  if(!analysis)return;
+  const a=analysis,t=tradeSetup,zones=collectZones();
+  setText('livePrice',fmt(a.last.c,2)+' ▲');
+  setText('symHead',symbol);
+  setText('tfHead',currentTF);
+  setText('tfBadge',currentTF);
+  setText('candleCount',candles.length);
+  setText('priceSub',`${symbol} • ${currentTF}`);
+  setText('decision',a.decision);
+  setText('confidence',a.score+'%');
+  setText('setupEntry',fmt(t.entry,0));
+  setText('setupSL',fmt(t.sl,0));
+  setText('setupTP1',fmt(t.tp1,0));
+  setText('setupTP2',fmt(t.tp2,0));
+  setText('setupRR',fmt(t.rr,2));
+  setText('targetReason',a.projected.reason||'---');
+  setText('buyersPct',fmt(a.buyers,0)+'%');
+  setText('sellersPct',fmt(a.sellers,0)+'%');
+  setText('sideVWAP',fmt(a.vwap.at(-1),1));
+  setText('sideRSI',fmt(a.rsi.at(-1),1));
+  setText('sideATR',fmt(a.atrLast,1));
+  if($('sideMood')){$('sideMood').textContent=a.mood;$('sideMood').className=a.decision==='BUY'?'green':a.decision==='SELL'?'red':'orange';}
+  if($('priorityCards'))$('priorityCards').innerHTML=zones.slice(0,5).map((z,i)=>`<div class="prioCard ${z.class}"><div class="num">${i+1}</div><div class="prioMain"><b>${z.kind}</b><div class="price">${z.code} ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}</div><p>${z.action}</p></div><div class="score">${z.score}</div></div>`).join('');
   updateFullZones(zones); updateQuickFilter(a); updateMTF(); if($('tradeNarrative'))$('tradeNarrative').innerHTML=tradeNarrative(a,t);
 }
 function updateAll(){if(dataStatus!=='ok'||!candles.length){renderNoData();return;}analysis=analyze(candles);if(!analysis){setDataStatus('err','Not enough valid MetaAPI candles');renderNoData();return;}tradeSetup=makeTradeSetup(analysis);updatePanels();draw();checkSmartAlerts();}
