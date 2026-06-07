@@ -1,0 +1,10 @@
+{
+  "name": "BTC Pro Liquidity Engine",
+  "short_name": "BTC Pro",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#edf1f5",
+  "theme_color": "#f59e0b",
+  "dir": "rtl",
+  "lang": "ar"
+}

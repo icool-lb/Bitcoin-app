@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#f59e0b" />
 <title>₿ Bitcoin Pro Liquidity Engine — MetaAPI / MT5</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -45,6 +47,22 @@ button,input,select{font-family:inherit}
 .footerWarn{font-size:10px;color:var(--dim);line-height:1.5;text-align:center;padding:4px 8px}
 @media(max-width:1100px){body{overflow:auto}.app{height:auto;display:flex;flex-direction:column}.side,.right{overflow:visible;border:0}.center{height:72vh;min-height:560px}.header{grid-template-columns:1fr;gap:8px;height:auto;text-align:center}.brand,.headerTools{justify-content:center}.priceBox{min-width:0}.range{width:42vw}}
 @media(max-width:600px){.center{height:68vh;min-height:520px}.tfbar{padding:7px}.tf{padding:6px 10px}.legend{font-size:9px}.chartTop{display:none}.grid3{grid-template-columns:1fr 1fr}.side,.right{padding:8px}.sigDir{font-size:24px}.conf{font-size:25px}}
+
+/* ===== PRO LIGHT UPGRADE + ALERTS ===== */
+:root{
+  --bg:#edf1f5;--bg2:#f6f8fb;--bg3:#ffffff;--panel:#ffffff;--panel2:#f2f5f9;
+  --line:#d7dee8;--line2:#bcc8d6;--text:#1f2937;--muted:#607389;--dim:#7d8da3;
+  --btc:#f59e0b;--btc2:#ffbf47;--cyan:#00b8e6;--blue:#2563eb;
+  --green:#16a34a;--green2:#22c55e;--red:#dc2626;--red2:#ef4444;
+  --yellow:#d4a300;--orange:#f97316;--violet:#7c3aed;--pink:#db2777;
+  --buyZone:rgba(34,197,94,.12);--sellZone:rgba(239,68,68,.10);--fvgBull:rgba(0,184,230,.12);--fvgBear:rgba(249,115,22,.12);--liq:rgba(234,179,8,.95);
+  --shadow:0 10px 26px rgba(15,23,42,.08);--glowBlue:0 0 12px rgba(0,184,230,.32);--glowGold:0 0 12px rgba(245,158,11,.28);
+}
+body{background:radial-gradient(circle at 0% 0%,rgba(245,158,11,.10),transparent 26%),radial-gradient(circle at 100% 10%,rgba(37,99,235,.08),transparent 24%),linear-gradient(180deg,#edf1f5,#e8edf4)!important;color:var(--text)!important;}
+.header{height:74px;background:linear-gradient(180deg,#ffffff,#f3f6fa)!important;border-bottom:1px solid var(--line)!important;box-shadow:0 3px 16px rgba(15,23,42,.05)!important;backdrop-filter:none!important;}
+.coin{width:46px;height:46px;box-shadow:0 0 22px rgba(245,158,11,.32)!important}.brand h1{color:#8a5600!important}.brand p{color:var(--muted)!important}.livePrice{color:var(--cyan)!important;text-shadow:var(--glowBlue)!important}.pill{background:rgba(255,255,255,.95)!important;color:var(--muted)!important;box-shadow:var(--shadow)!important}.app{height:calc(100vh - 74px)!important;grid-template-columns:310px 1fr 360px!important}.side,.right{background:linear-gradient(180deg,#f8fafc,#eef3f8)!important;border-inline:1px solid var(--line)!important;padding:12px!important}.center{background:#f6f8fb!important}.section{background:linear-gradient(180deg,var(--panel),var(--panel2))!important;border:1px solid var(--line)!important;box-shadow:var(--shadow)!important;border-radius:16px!important}.stitle{color:#915800!important}.stat{background:#fbfcfe!important;border:1px solid var(--line)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)!important}.row{border-bottom:1px solid rgba(148,163,184,.18)!important}.green{color:var(--green)!important;text-shadow:0 0 10px rgba(34,197,94,.18)}.red{color:var(--red)!important;text-shadow:0 0 10px rgba(239,68,68,.16)}.yellow{color:var(--yellow)!important;text-shadow:var(--glowGold)}.cyan{color:var(--cyan)!important;text-shadow:var(--glowBlue)}.orange{color:var(--orange)!important;text-shadow:0 0 10px rgba(249,115,22,.18)}.violet{color:var(--violet)!important;text-shadow:0 0 10px rgba(124,58,237,.16)}.tfbar,.legend,.zoomBar{background:linear-gradient(180deg,#fff,#f6f8fb)!important;border-color:var(--line)!important}.tf,.tbtn,.zbtn{background:#fff!important;color:var(--muted)!important;border:1px solid var(--line)!important;box-shadow:var(--shadow)!important}.tf.active{background:linear-gradient(145deg,rgba(245,158,11,.18),rgba(0,184,230,.10))!important;border-color:rgba(245,158,11,.55)!important;color:#8a5600!important}.tbtn.on{color:var(--cyan)!important;border-color:rgba(0,184,230,.35)!important;background:rgba(0,184,230,.06)!important}.chartArea{background:linear-gradient(180deg,#fbfdff,#f4f7fb)!important}.badge{background:rgba(255,255,255,.96)!important;color:var(--muted)!important;border:1px solid var(--line2)!important;box-shadow:var(--shadow)!important}.tooltip{background:rgba(255,255,255,.98)!important;color:var(--text)!important;box-shadow:0 15px 30px rgba(0,0,0,.18)!important}.signal{background:linear-gradient(145deg,rgba(245,158,11,.16),rgba(0,184,230,.05))!important;box-shadow:var(--shadow)!important}.conf{color:#8a5600!important;text-shadow:var(--glowGold)!important}.level,.reason,.plan,.tag{background:#fbfcfe!important;color:#334155!important;border-color:var(--line)!important}.input{background:#fff!important;color:var(--text)!important;border-color:var(--line)!important}.btn{background:linear-gradient(145deg,rgba(245,158,11,.18),rgba(245,158,11,.06))!important;color:#8a5600!important;box-shadow:var(--shadow)!important}.helpNote{font-size:10px;line-height:1.65;color:#43556c;background:#f8fbff;border:1px dashed #c7d3e3;border-radius:10px;padding:8px;margin-top:7px}.badgeBtn{pointer-events:auto;border:1px solid rgba(245,158,11,.35);background:linear-gradient(145deg,rgba(245,158,11,.18),rgba(245,158,11,.06));color:#8a5600;border-radius:12px;padding:7px 11px;font-size:11px;cursor:pointer;font-weight:800;box-shadow:var(--shadow)}.solidIcon{width:20px;height:0;border-top:2px solid currentColor}.targetCard{border:1px solid rgba(37,99,235,.18);background:linear-gradient(145deg,rgba(37,99,235,.06),rgba(0,184,230,.04));border-radius:12px;padding:10px;margin-top:8px}.alertPanel{border:1px solid rgba(245,158,11,.35);background:linear-gradient(145deg,rgba(245,158,11,.12),rgba(255,255,255,.75));}.alertLog{max-height:125px;overflow:auto;display:grid;gap:5px;margin-top:7px}.alertItem{font-size:10px;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 8px}.alertItem strong{font-family:'JetBrains Mono'}
+@media(max-width:1100px){.app{height:auto!important;display:flex!important;flex-direction:column}.center{height:72vh;min-height:620px}.header{height:auto!important}}
+
 </style>
 </head>
 <body>
@@ -90,6 +108,13 @@ button,input,select{font-family:inherit}
       <div class="row"><span class="lbl">FVG غير ممسوحة</span><span class="val" id="fvgCount">---</span></div>
       <div class="row"><span class="lbl">سيولة قريبة</span><span class="val" id="liqNear">---</span></div>
       <div class="reason" id="quickFilter">انتظر اكتمال البيانات.</div>
+      <div class="helpNote">
+        <b>شرح فلتر الدخول السريع:</b><br>
+        • <b>قرب دعم قوي</b>: المسافة بين السعر الحالي وأقوى دعم قريب، وليس سعر الدعم نفسه.<br>
+        • <b>قرب مقاومة قوية</b>: المسافة إلى أقرب مقاومة؛ إذا كان الرقم صغيرًا فالمطاردة خطرة.<br>
+        • <b>FVG غير ممسوحة</b>: فجوات قيمة عادلة ما زالت فعّالة.<br>
+        • <b>سيولة قريبة</b>: أقرب Equal Highs/Lows قد ينجذب لها السعر.
+      </div>
     </section>
 
     <section class="section">
@@ -98,6 +123,17 @@ button,input,select{font-family:inherit}
         <button class="btn" onclick="resetView()">إعادة ضبط الشارت</button>
         <button class="btn" onclick="refreshAll()">تحديث الآن</button>
       </div>
+      <div style="height:8px"></div>
+      <div class="grid2">
+        <button class="btn" onclick="saveChartImage()">حفظ الشارت PNG HD</button>
+        <button class="btn" onclick="toggleFullscreenChart()">تكبير الشارت</button>
+      </div>
+      <div style="height:8px"></div>
+      <div class="grid2">
+        <button class="btn" onclick="enableProAlerts()">تفعيل التنبيهات</button>
+        <button class="btn" onclick="testArabicAlert()">اختبار صوت عربي</button>
+      </div>
+      <div id="alertStatus" class="helpNote">التنبيهات غير مفعّلة بعد. اضغط تفعيل التنبيهات مرة واحدة من الهاتف.</div>
       <div style="height:8px"></div>
       <label class="small">رمز MetaTrader / MetaAPI</label>
       <input class="input" id="symbolInput" value="BTCUSD" placeholder="BTCUSD أو BTCUSDm حسب البروكر" />
@@ -128,12 +164,16 @@ button,input,select{font-family:inherit}
       <span class="lg"><span class="box" style="background:var(--fvgBear)"></span>FVG Bear</span>
       <span class="lg"><span class="lineIcon" style="color:var(--yellow)"></span>سيولة</span>
       <span class="lg"><span class="lineIcon" style="color:var(--violet)"></span>VWAP</span>
+      <span class="lg"><span class="solidIcon" style="color:var(--yellow)"></span>EMA20</span>
+      <span class="lg"><span class="solidIcon" style="color:var(--blue)"></span>EMA50</span>
+      <span class="lg"><span class="lineIcon" style="color:#64748b"></span>EMA200</span>
+      <span class="lg"><span class="lineIcon" style="color:var(--pink)"></span>TP/SL/Target</span>
       <div class="toggles">
         <button class="tbtn on" data-toggle="sr">S/R</button><button class="tbtn on" data-toggle="fvg">FVG</button><button class="tbtn on" data-toggle="liq">Liquidity</button><button class="tbtn on" data-toggle="ema">EMA</button><button class="tbtn on" data-toggle="vwap">VWAP</button><button class="tbtn on" data-toggle="ob">OB</button>
       </div>
     </div>
     <div class="chartArea" id="chartArea">
-      <div class="chartTop"><div class="badge">TF: <strong id="tfBadge">M15</strong> • Candles: <strong id="candleCount">---</strong></div><div class="badge">منطقة السعر: <strong id="zoneBadge">---</strong></div></div>
+      <div class="chartTop"><div class="badge">TF: <strong id="tfBadge">M15</strong> • Candles: <strong id="candleCount">---</strong></div><div class="badge">منطقة السعر: <strong id="zoneBadge">---</strong> • الهدف: <strong id="targetBadge">---</strong></div><button class="badgeBtn" onclick="saveChartImage()">حفظ HD</button></div>
       <canvas id="chart"></canvas>
       <div class="cross v" id="crossV"></div><div class="cross h" id="crossH"></div><div class="tooltip" id="tip"></div>
     </div>
@@ -164,6 +204,28 @@ button,input,select{font-family:inherit}
         <div class="stat"><div class="n">Equal Lows</div><div class="v yellow" id="eqLows">0</div><div class="small">سيولة بيع تحت</div></div>
       </div>
       <table class="miniTable" style="margin-top:7px"><thead><tr><th>نوع</th><th>من</th><th>إلى</th><th>حالة</th></tr></thead><tbody id="fvgTable"></tbody></table>
+    </section>
+
+    <section class="section">
+      <div class="stitle">هدف الحركة السعري</div>
+      <div class="targetCard">
+        <div class="row"><span class="lbl">الاتجاه المرجح</span><span class="val" id="moveDir">---</span></div>
+        <div class="row"><span class="lbl">الهدف الأساسي</span><span class="val pink" id="moveTarget">---</span></div>
+        <div class="row"><span class="lbl">مدى الحركة المتوقع</span><span class="val violet" id="moveRange">---</span></div>
+        <div class="row"><span class="lbl">نسبة R:R</span><span class="val yellow" id="rrBox">---</span></div>
+        <div class="row"><span class="lbl">سبب الهدف</span><span class="val" id="moveReason">---</span></div>
+      </div>
+    </section>
+
+    <section class="section alertPanel">
+      <div class="stitle">التنبيهات الذكية</div>
+      <div class="grid2">
+        <button class="btn" onclick="enableProAlerts()">تفعيل الإشعارات</button>
+        <button class="btn" onclick="testArabicAlert()">اختبار الصوت</button>
+      </div>
+      <div class="row"><span class="lbl">الحالة</span><span class="val" id="alertState">OFF</span></div>
+      <div class="row"><span class="lbl">آخر تنبيه</span><span class="val" id="lastAlertText">---</span></div>
+      <div class="alertLog" id="alertLog"><div class="alertItem">لا توجد تنبيهات بعد.</div></div>
     </section>
 
     <section class="section">
@@ -278,7 +340,7 @@ function detectLiquidity(levelsS,levelsR,price,atrLast){const liq=[]; const tol=
 function detectOB(cs,atrA){let obs=[]; for(let i=3;i<cs.length;i++){const imp=Math.abs(cs[i].c-cs[i-1].c); if(imp>atrA[i]*1.15){if(cs[i].c>cs[i].o){let j=i-1; while(j>1 && cs[j].c>=cs[j].o)j--; if(cs[j])obs.push({type:'DEMAND',i:j,from:cs[j].l,to:Math.max(cs[j].o,cs[j].c),end:i});}else{let j=i-1; while(j>1 && cs[j].c<=cs[j].o)j--; if(cs[j])obs.push({type:'SUPPLY',i:j,from:Math.min(cs[j].o,cs[j].c),to:cs[j].h,end:i});}}} return obs.slice(-8);}
 function analyze(cs){
   if(cs.length<60)return null;
-  const closes=cs.map(x=>x.c); const vols=cs.map(x=>x.v); const e20=ema(closes,20),e50=ema(closes,50),e200=ema(closes,200); const atr=calcATR(cs,14); const rsi=calcRSI(cs,14); const vwap=calcVWAP(cs); const last=cs.at(-1); const atrLast=atr.at(-1); const pv=pivots(cs,3,3); const tol=Math.max(atrLast*.35,last.c*.0012); const res=clusterLevels(pv.hi,tol,6).filter(x=>x.price>last.c-atrLast*1.5).sort((a,b)=>a.price-b.price); const sup=clusterLevels(pv.lo,tol,6).filter(x=>x.price<last.c+atrLast*1.5).sort((a,b)=>b.price-a.price);
+  const closes=cs.map(x=>x.c); const vols=cs.map(x=>x.v); const e20=ema(closes,20),e50=ema(closes,50),e200=ema(closes,200); const atr=calcATR(cs,14); const rsi=calcRSI(cs,14); const vwap=calcVWAP(cs); const last=cs.at(-1); const atrLast=atr.at(-1); const pv=pivots(cs,3,3); const tol=Math.max(atrLast*.26,last.c*.0009); const res=clusterLevels(pv.hi,tol,6).filter(x=>x.price>last.c-atrLast*1.5).sort((a,b)=>a.price-b.price); const sup=clusterLevels(pv.lo,tol,6).filter(x=>x.price<last.c+atrLast*1.5).sort((a,b)=>b.price-a.price);
   const fvg=detectFVG(cs,atrLast); const liq=detectLiquidity(sup,res,last.c,atrLast); const ob=detectOB(cs,atr); const recent=cs.slice(-30); const buyVol=recent.filter(x=>x.c>=x.o).reduce((s,x)=>s+x.v,0); const sellVol=recent.filter(x=>x.c<x.o).reduce((s,x)=>s+x.v,0); const buyers=buyVol/(buyVol+sellVol||1)*100; const volAvg=avg(vols.slice(-80,-10)); const volNow=avg(vols.slice(-10));
   let score=50; if(last.c>e20.at(-1))score+=9; else score-=9; if(last.c>e50.at(-1))score+=12; else score-=12; if(last.c>e200.at(-1))score+=10; else score-=10; if(e20.at(-1)>e50.at(-1))score+=8; else score-=8; if(last.c>vwap.at(-1))score+=8; else score-=8; if(rsi.at(-1)>55)score+=8; if(rsi.at(-1)<45)score-=8; if(buyers>56)score+=8; if(buyers<44)score-=8; if(fvg.some(x=>x.type==='BULL' && x.to<last.c))score+=4; if(fvg.some(x=>x.type==='BEAR' && x.from>last.c))score-=4; score=clamp(Math.round(score),0,100);
   let decision='WAIT', mood='محايد'; if(score>=67){decision='BUY';mood='مزاج شراء'} else if(score<=33){decision='SELL';mood='مزاج بيع'};
@@ -321,7 +383,7 @@ function draw(){if(!analysis)return; setupCanvas(); const cv=$('chart'),ctx=cv.g
   if(overlays.liq)drawLiquidity(ctx,analysis.liq,y,pad,plotW);
   if(overlays.vwap)drawSeries(ctx,analysis.vwap,start,end,x,y,color('--violet'),1.6,[5,5],'VWAP');
   if(overlays.ema){drawSeries(ctx,analysis.e20,start,end,x,y,color('--yellow'),1.4,[],'EMA20');drawSeries(ctx,analysis.e50,start,end,x,y,color('--blue'),1.4,[],'EMA50');drawSeries(ctx,analysis.e200,start,end,x,y,'rgba(226,232,240,.45)',1.2,[4,5],'EMA200');}
-  drawCandles(ctx,cs,start,x,y,barW); drawPriceLine(ctx,analysis.last.c,y,pad,plotW); drawAxis(ctx,w,h,pad,min,max,y,cs,start,end,x); ctx.restore();}
+  drawCandles(ctx,cs,start,x,y,barW); drawPriceLine(ctx,analysis.last.c,y,pad,plotW); drawSetupLines(ctx,analysis,y,pad,plotW); drawAxis(ctx,w,h,pad,min,max,y,cs,start,end,x); ctx.restore();}
 function drawGrid(ctx,w,h,pad,min,max,y){ctx.strokeStyle='rgba(148,163,184,.10)';ctx.lineWidth=1;ctx.font='10px JetBrains Mono';ctx.fillStyle='rgba(148,163,184,.65)'; for(let i=0;i<=8;i++){const yy=pad.t+i*(h-pad.t-pad.b)/8;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke(); const val=max-(max-min)*i/8;ctx.fillText(fmt(val,0),w-pad.r+7,yy+3);} for(let i=0;i<=10;i++){const xx=pad.l+i*(w-pad.l-pad.r)/10;ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,h-pad.b);ctx.stroke();}}
 function drawCandles(ctx,cs,start,x,y,barW){cs.forEach((c,idx)=>{const i=start+idx,xx=x(i),up=c.c>=c.o,clr=up?color('--green'):color('--red');ctx.strokeStyle=clr;ctx.fillStyle=clr;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(xx,y(c.h));ctx.lineTo(xx,y(c.l));ctx.stroke(); const yo=y(c.o),yc=y(c.c); const top=Math.min(yo,yc),bh=Math.max(1,Math.abs(yc-yo));ctx.fillRect(xx-barW/2,top,barW,bh);});}
 function drawSeries(ctx,arr,start,end,x,y,clr,lw,dash,label){ctx.save();ctx.strokeStyle=clr;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();let first=true;for(let i=start;i<end;i++){const v=arr[i];if(!Number.isFinite(v))continue; if(first){ctx.moveTo(x(i),y(v));first=false}else ctx.lineTo(x(i),y(v));}ctx.stroke();ctx.restore();}
@@ -342,7 +404,158 @@ chartArea.addEventListener('wheel',e=>{e.preventDefault(); if(e.deltaY<0)zoomIn(
 function showCross(x,ypos){if(!analysis)return; $('crossV').style.display=$('crossH').style.display='block'; $('crossV').style.left=x+'px'; $('crossH').style.top=ypos+'px'; const {start,end,cs}=getView(); const rect=chartArea.getBoundingClientRect(); const pad={l:55,r:76,t:38,b:34}; const plotW=rect.width-pad.l-pad.r; const idx=clamp(Math.floor((x-pad.l)/plotW*(end-start))+start,0,candles.length-1); const c=candles[idx]; if(c){const tip=$('tip');tip.style.display='block'; tip.style.left=clamp(x+12,8,rect.width-220)+'px'; tip.style.top=clamp(ypos+12,8,rect.height-120)+'px'; tip.innerHTML=`<b>${new Date(c.t).toLocaleString('en-GB')}</b><br>O ${fmt(c.o,2)} H ${fmt(c.h,2)}<br>L ${fmt(c.l,2)} C ${fmt(c.c,2)}<br>VOL ${fmt(c.v,2)}`;}}
 window.addEventListener('resize',draw);
 
+
+
+/* ===== PRO ALERTS + TARGET ENGINE ===== */
+let proAlertsEnabled = localStorage.getItem('btc_pro_alerts') === '1';
+let lastAlertAt = {};
+function nearestCandidate(a, side){
+  const p=a.last.c, atr=a.atrLast;
+  const c=[];
+  if(side==='up'){
+    a.levels.res.forEach(z=>c.push({price:z.price, reason:'مقاومة/منطقة عرض'}));
+    a.liq.filter(x=>x.price>p).forEach(x=>c.push({price:x.price, reason:x.type+' liquidity'}));
+    a.fvg.filter(x=>x.type==='BEAR' && x.from>p).forEach(x=>c.push({price:x.mid, reason:'Bearish FVG fill'}));
+    c.sort((x,y)=>x.price-y.price); return c[0]||{price:p+atr*1.8,reason:'امتداد ATR'};
+  }
+  a.levels.sup.forEach(z=>c.push({price:z.price, reason:'دعم/منطقة طلب'}));
+  a.liq.filter(x=>x.price<p).forEach(x=>c.push({price:x.price, reason:x.type+' liquidity'}));
+  a.fvg.filter(x=>x.type==='BULL' && x.to<p).forEach(x=>c.push({price:x.mid, reason:'Bullish FVG fill'}));
+  c.sort((x,y)=>y.price-x.price); return c[0]||{price:p-atr*1.8,reason:'امتداد ATR'};
+}
+function computeSetup(a){
+  const p=a.last.c, atr=a.atrLast, s=a.levels.sup[0], r=a.levels.res[0];
+  let dir=a.decision, up=nearestCandidate(a,'up'), dn=nearestCandidate(a,'down');
+  if(dir==='WAIT') dir=(up.price-p) <= (p-dn.price) ? 'BUY' : 'SELL';
+  if(dir==='BUY'){
+    const entry=s?Math.max(s.price,p-atr*1.05):p-atr*.8;
+    const sl=(s?s.price:entry)-atr*.65;
+    const tp1=up.price;
+    const tp2=Math.max(tp1+atr*1.15, tp1);
+    return {dir, entry, sl, tp1, tp2, target:tp1, move:tp1-p, reason:up.reason, rr:Math.abs(tp1-entry)/Math.max(1,Math.abs(entry-sl))};
+  }
+  const entry=r?Math.min(r.price,p+atr*1.05):p+atr*.8;
+  const sl=(r?r.price:entry)+atr*.65;
+  const tp1=dn.price;
+  const tp2=Math.min(tp1-atr*1.15, tp1);
+  return {dir, entry, sl, tp1, tp2, target:tp1, move:p-tp1, reason:dn.reason, rr:Math.abs(entry-tp1)/Math.max(1,Math.abs(sl-entry))};
+}
+function updateMovementTarget(){
+  if(!analysis) return;
+  const st=computeSetup(analysis); analysis.setup=st;
+  const up=st.dir==='BUY';
+  if($('moveDir')){ $('moveDir').textContent=up?'صعود':'هبوط'; $('moveDir').className='val '+(up?'green':'red'); }
+  if($('moveTarget')) $('moveTarget').textContent=fmt(st.target,0);
+  if($('moveRange')) $('moveRange').textContent='$'+fmt(st.move,1);
+  if($('moveReason')) $('moveReason').textContent=st.reason;
+  if($('rrBox')) $('rrBox').textContent='1 : '+fmt(st.rr,2);
+  if($('targetBadge')) $('targetBadge').textContent=fmt(st.target,0);
+}
+function drawSetupLines(ctx,a,y,pad,plotW){
+  const st=a.setup||computeSetup(a);
+  const lines=[['ENTRY',st.entry,'#2563eb'],['SL',st.sl,color('--red')],['TP1',st.tp1,color('--green')],['TP2',st.tp2,color('--pink')],['TARGET',st.target,color('--violet')]];
+  lines.forEach(([name,price,clr])=>{
+    if(!Number.isFinite(price)) return;
+    const yy=y(price); ctx.save(); ctx.strokeStyle=clr; ctx.lineWidth=name==='ENTRY'?1.6:1.2; ctx.setLineDash(name==='SL'?[7,5]:name.startsWith('TP')?[4,4]:[9,5]); ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(pad.l+plotW,yy); ctx.stroke(); ctx.setLineDash([]); label(ctx,`${name} ${fmt(price,0)}`, pad.l+12, yy-16, clr); ctx.restore();
+  });
+}
+function saveChartImage(){
+  const cv=$('chart');
+  if(!cv) return;
+  const a=document.createElement('a');
+  a.href=cv.toDataURL('image/png');
+  a.download=`${symbol}_${currentTF}_chart_HD_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`;
+  a.click();
+}
+function toggleFullscreenChart(){
+  const el=$('chartArea');
+  if(!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen();
+  else if(document.exitFullscreen) document.exitFullscreen();
+}
+async function registerSW(){
+  if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('/sw.js'); }catch(e){ console.warn('SW register failed',e); } }
+}
+function pickArabicVoice(){
+  const voices = (speechSynthesis && speechSynthesis.getVoices && speechSynthesis.getVoices()) || [];
+  return voices.find(v=>/^ar/i.test(v.lang)) || voices.find(v=>/arabic|ar-|ar_/i.test(v.name+v.lang)) || null;
+}
+function speakArabic(text){
+  try{
+    if('speechSynthesis' in window){
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text);
+      u.lang='ar-SA'; u.rate=.92; u.pitch=1.02; u.volume=1;
+      const v=pickArabicVoice(); if(v) u.voice=v;
+      speechSynthesis.speak(u);
+    }
+  }catch(e){ console.warn('speech failed',e); }
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext; const ac=new AC();
+    const o=ac.createOscillator(), g=ac.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=.05; o.connect(g); g.connect(ac.destination); o.start(); setTimeout(()=>{o.stop(); ac.close();},180);
+  }catch(e){}
+}
+async function enableProAlerts(){
+  proAlertsEnabled=true; localStorage.setItem('btc_pro_alerts','1');
+  let perm='unsupported';
+  if('Notification' in window){
+    perm=Notification.permission;
+    if(perm==='default') perm=await Notification.requestPermission();
+  }
+  await registerSW();
+  if($('alertStatus')) $('alertStatus').innerHTML=`التنبيهات مفعّلة. إذن الإشعارات: <b>${perm}</b>. اترك الصفحة مفتوحة أو ثبّت الموقع كتطبيق للحصول على أفضل نتيجة.`;
+  if($('alertState')) $('alertState').textContent='ON';
+  speakArabic('تم تفعيل تنبيهات البيتكوين. سأخبرك عند ظهور فرصة أو خطر قريب.');
+}
+function testArabicAlert(){
+  enableProAlerts();
+  fireProAlert('اختبار تنبيه عربي', 'تنبيه تجريبي: الصوت والإشعار يعملان الآن.', 'test', true);
+}
+async function fireProAlert(title, body, key='general', force=false){
+  const now=Date.now();
+  if(!force && lastAlertAt[key] && now-lastAlertAt[key] < 4*60*1000) return;
+  lastAlertAt[key]=now;
+  const text=`${title}. ${body}`;
+  if($('lastAlertText')) $('lastAlertText').textContent=title;
+  if($('alertLog')){
+    const item=document.createElement('div'); item.className='alertItem'; item.innerHTML=`<strong>${new Date().toLocaleTimeString('en-GB')}</strong> — ${text}`;
+    if($('alertLog').children.length===1 && $('alertLog').textContent.includes('لا توجد')) $('alertLog').innerHTML='';
+    $('alertLog').prepend(item);
+    while($('alertLog').children.length>8) $('alertLog').lastChild.remove();
+  }
+  speakArabic(text);
+  try{
+    if('Notification' in window && Notification.permission==='granted'){
+      const opts={body,tag:key,renotify:true,requireInteraction:false,dir:'rtl',lang:'ar'};
+      if(navigator.serviceWorker && navigator.serviceWorker.ready){ const reg=await navigator.serviceWorker.ready; reg.showNotification(title,opts); }
+      else new Notification(title,opts);
+    }
+  }catch(e){ console.warn('notify failed',e); }
+}
+function checkProAlerts(){
+  if(!proAlertsEnabled || !analysis) return;
+  const a=analysis, p=a.last.c, atr=a.atrLast, st=a.setup||computeSetup(a);
+  const nearSup=a.levels.sup[0] ? p-a.levels.sup[0].price : Infinity;
+  const nearRes=a.levels.res[0] ? a.levels.res[0].price-p : Infinity;
+  if(a.decision==='BUY' && a.score>=72) fireProAlert('فرصة شراء محتملة على البيتكوين', `الثقة ${a.score} بالمئة، الهدف ${fmt(st.tp1,0)}، الستوب المقترح ${fmt(st.sl,0)}.`, 'buy-signal');
+  if(a.decision==='SELL' && a.score<=28) fireProAlert('فرصة بيع محتملة على البيتكوين', `الثقة ${100-a.score} بالمئة، الهدف ${fmt(st.tp1,0)}، الستوب المقترح ${fmt(st.sl,0)}.`, 'sell-signal');
+  if(nearSup < atr*.65) fireProAlert('السعر اقترب من دعم قوي', `المسافة إلى الدعم حوالي ${fmt(nearSup,1)} دولار. انتظر شمعة رفض قبل الشراء.`, 'near-support');
+  if(nearRes < atr*.65) fireProAlert('السعر اقترب من مقاومة قوية', `المسافة إلى المقاومة حوالي ${fmt(nearRes,1)} دولار. احذر من جني أرباح أو رفض.`, 'near-resistance');
+  if(a.liq[0] && Math.abs(a.liq[0].dist) < atr*.75) fireProAlert('السعر قريب من منطقة سيولة', `${a.liq[0].type} عند ${fmt(a.liq[0].price,0)}.`, 'near-liquidity');
+}
+
+const _oldUpdatePanels = updatePanels;
+updatePanels = function(){ _oldUpdatePanels(); updateMovementTarget(); checkProAlerts(); };
+const _oldUpdateTradePlan = updateTradePlan;
+updateTradePlan = function(){
+  _oldUpdateTradePlan();
+  if(!analysis || !$('tradePlan')) return;
+  const st=analysis.setup||computeSetup(analysis);
+  $('tradePlan').insertAdjacentHTML('beforeend', `<div class="plan">خطة احترافية إضافية: <b class="cyan">Entry</b> ${fmt(st.entry,0)} — <b class="red">SL</b> ${fmt(st.sl,0)} — <b class="green">TP1</b> ${fmt(st.tp1,0)} — <b class="violet">TP2</b> ${fmt(st.tp2,0)} — <b class="yellow">R:R</b> 1:${fmt(st.rr,2)}.</div>`);
+};
+
 function start(){refreshAll(); if(refreshTimer)clearInterval(refreshTimer); refreshTimer=setInterval(()=>loadTF(currentTF,true),15000);}
+registerSW();
+if(proAlertsEnabled){ if($('alertState')) $('alertState').textContent='ON'; if($('alertStatus')) $('alertStatus').textContent='التنبيهات مفعّلة مسبقًا.'; }
 start();
 </script>
 </body>
