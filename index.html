@@ -2,214 +2,293 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <link rel="manifest" href="/manifest.webmanifest"/>
-<meta name="theme-color" content="#eef2f7"/>
-<title>BTC Pro Liquidity Engine V7 Pro Clean — MetaAPI</title>
+<meta name="theme-color" content="#f5f7fb"/>
+<title>BTC Pro Liquidity Engine V9 — Hybrid Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#edf2f7;--bg2:#f7fafc;--panel:#ffffff;--panel2:#f2f6fb;
-  --chart:#fbfdff;--chart2:#f4f8fc;--line:#d8e1eb;--line2:#b9c6d4;
-  --text:#1f2937;--muted:#64748b;--dim:#94a3b8;
-  --gold:#f59e0b;--gold2:#ffc15a;--cyan:#00b8e6;--blue:#2563eb;
-  --green:#16a34a;--red:#dc2626;--yellow:#ca8a04;--orange:#f97316;--violet:#7c3aed;--pink:#db2777;
-  --buyZone:rgba(34,197,94,.13);--sellZone:rgba(239,68,68,.11);
-  --fvgBull:rgba(0,184,230,.13);--fvgBear:rgba(249,115,22,.13);--liq:rgba(202,138,4,.96);
-  --shadow:0 10px 28px rgba(15,23,42,.08);--glowBlue:0 0 14px rgba(0,184,230,.35);--glowGold:0 0 14px rgba(245,158,11,.32);
+  --bg:#f3f6fa;--panel:#ffffff;--panel2:#f7fafc;--line:#d9e2ec;--line2:#bfccd9;
+  --text:#152033;--muted:#64748b;--dim:#8a9aae;
+  --gold:#b77900;--gold2:#f59e0b;--orange:#f59e0b;--blue:#2563eb;--violet:#7c3aed;--cyan:#0891b2;
+  --green:#16a34a;--green2:#22c55e;--red:#dc2626;--red2:#ef4444;
+  --support:rgba(22,163,74,.12);--resist:rgba(239,68,68,.105);--fvgBull:rgba(8,145,178,.12);--fvgBear:rgba(245,158,11,.13);--ob:rgba(124,58,237,.10);
+  --shadow:0 14px 35px rgba(15,23,42,.08);--shadow2:0 22px 55px rgba(15,23,42,.15);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{font-family:Cairo,sans-serif;background:radial-gradient(circle at 0 0,rgba(245,158,11,.11),transparent 27%),radial-gradient(circle at 100% 8%,rgba(0,184,230,.10),transparent 25%),linear-gradient(180deg,var(--bg),#e7edf5);color:var(--text);overflow:hidden}
-button,input{font-family:inherit}
-.header{min-height:78px;padding:10px 14px;display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;background:linear-gradient(180deg,#fff,#f3f6fa);border-bottom:1px solid var(--line);box-shadow:0 3px 18px rgba(15,23,42,.06);position:sticky;top:0;z-index:50}
-.brand{display:flex;align-items:center;gap:12px;min-width:0}.coin{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#ffd47a,#f59e0b);font-family:Orbitron;font-weight:900;color:#1f2937;box-shadow:0 0 24px rgba(245,158,11,.33)}
-.brand h1{font-family:Orbitron,monospace;font-size:15px;letter-spacing:1.4px;color:#835500;white-space:nowrap}.brand p{font-size:10px;color:var(--muted);white-space:nowrap;margin-top:2px}
-.priceBox{text-align:center;min-width:230px}.livePrice{font-family:'JetBrains Mono';font-size:32px;line-height:1;font-weight:900;color:var(--cyan);text-shadow:var(--glowBlue)}.priceSub{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);margin-top:6px}
-.tools{display:flex;justify-content:flex-end;align-items:center;gap:7px;flex-wrap:wrap}.pill,.hbtn{border:1px solid var(--line2);background:#fff;border-radius:999px;padding:6px 10px;color:var(--muted);font-size:11px;box-shadow:var(--shadow);display:inline-flex;gap:6px;align-items:center}.hbtn{cursor:pointer;font-weight:800;color:#835500;border-color:rgba(245,158,11,.38);background:linear-gradient(145deg,rgba(245,158,11,.18),rgba(245,158,11,.05))}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse 1.25s infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.7)}}
-.app{height:calc(100vh - 78px);display:grid;grid-template-columns:320px 1fr 370px;min-height:0}.side,.right{overflow:auto;padding:12px;background:linear-gradient(180deg,#f8fafc,#eef3f8);border-inline:1px solid var(--line)}.center{display:flex;flex-direction:column;min-width:0;background:#f8fafc}
-.section{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow)}.stitle{font-family:Orbitron;font-size:10px;letter-spacing:1.4px;color:#835500;margin-bottom:9px;display:flex;align-items:center;gap:7px}.stitle:before{content:'';width:4px;height:15px;border-radius:8px;background:linear-gradient(var(--gold2),var(--gold))}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stat{background:#fbfdff;border:1px solid var(--line);border-radius:13px;padding:8px;text-align:center;min-height:58px;box-shadow:inset 0 1px 0 rgba(255,255,255,.75)}.stat .n{font-size:10px;color:var(--muted)}.stat .v{font-family:'JetBrains Mono';font-size:17px;font-weight:900;margin-top:2px}.small{font-size:9px;color:var(--dim)}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid rgba(148,163,184,.18);padding:7px 0;font-size:12px}.row:last-child{border-bottom:0}.lbl{color:var(--muted)}.val{font-family:'JetBrains Mono';font-weight:900}.green{color:var(--green);text-shadow:0 0 10px rgba(22,163,74,.20)}.red{color:var(--red);text-shadow:0 0 10px rgba(220,38,38,.18)}.yellow{color:var(--yellow);text-shadow:var(--glowGold)}.cyan{color:var(--cyan);text-shadow:var(--glowBlue)}.orange{color:var(--orange)}.violet{color:var(--violet)}.pink{color:var(--pink)}
-.tfbar{display:flex;gap:6px;padding:10px;background:linear-gradient(180deg,#fff,#f6f8fb);border-bottom:1px solid var(--line);overflow:auto}.tf{border:1px solid var(--line);background:#fff;color:var(--muted);padding:8px 13px;border-radius:12px;cursor:pointer;font-family:'JetBrains Mono';font-weight:900;box-shadow:var(--shadow)}.tf.active{color:#835500;background:linear-gradient(145deg,rgba(245,158,11,.18),rgba(0,184,230,.08));border-color:rgba(245,158,11,.55)}
-.legend{display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:auto;padding:8px 12px;background:#f4f7fb;border-bottom:1px solid var(--line);font-family:'JetBrains Mono';font-size:10px;color:var(--muted)}.lg{display:inline-flex;gap:5px;align-items:center}.box{width:12px;height:8px;border-radius:2px}.lineIcon{width:20px;height:0;border-top:2px dashed currentColor}.solidIcon{width:20px;height:0;border-top:2px solid currentColor}.toggles{margin-inline-start:auto;display:flex;gap:5px}.tbtn{background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:5px 8px;font-size:10px;cursor:pointer;box-shadow:var(--shadow)}.tbtn.on{color:var(--cyan);border-color:rgba(0,184,230,.35);background:rgba(0,184,230,.06)}
-.chartArea{position:relative;flex:1;min-height:0;background:linear-gradient(180deg,var(--chart),var(--chart2));overflow:hidden}.chartTop{position:absolute;top:10px;left:10px;right:10px;z-index:5;display:flex;justify-content:space-between;gap:8px;pointer-events:none;flex-wrap:wrap}.badge,.badgeBtn{pointer-events:auto;border:1px solid var(--line2);background:rgba(255,255,255,.96);border-radius:12px;padding:7px 10px;font-size:11px;color:var(--muted);box-shadow:var(--shadow)}.badge strong{font-family:'JetBrains Mono';color:var(--text)}.badgeBtn{cursor:pointer;color:#835500;border-color:rgba(245,158,11,.40);font-weight:900;background:linear-gradient(145deg,rgba(245,158,11,.16),rgba(245,158,11,.05))}
-#chart{width:100%;height:100%;display:block;cursor:crosshair}.cross{position:absolute;z-index:4;pointer-events:none;display:none}.cross.v{top:0;bottom:0;width:1px;background:rgba(30,41,59,.16)}.cross.h{left:0;right:0;height:1px;background:rgba(30,41,59,.16)}.tooltip{position:absolute;z-index:10;display:none;pointer-events:none;background:rgba(255,255,255,.98);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font-family:'JetBrains Mono';font-size:11px;color:var(--text);box-shadow:0 15px 30px rgba(0,0,0,.18);direction:ltr;text-align:left;min-width:205px}
-.zoomBar{height:52px;border-top:1px solid var(--line);background:linear-gradient(180deg,#fff,#f4f7fb);display:flex;align-items:center;justify-content:center;gap:8px;padding:7px}.zbtn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:7px 11px;cursor:pointer;box-shadow:var(--shadow)}.range{width:min(430px,45vw)}
-.signal{border-radius:16px;padding:13px;background:linear-gradient(145deg,rgba(245,158,11,.16),rgba(0,184,230,.05));border:1px solid rgba(245,158,11,.30);box-shadow:var(--shadow);overflow:hidden;position:relative}.signal:before{content:'';position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent,var(--gold2),transparent)}.sigHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.sigDir{font-family:Orbitron;font-size:30px;font-weight:900;letter-spacing:1.4px}.conf{font-family:'JetBrains Mono';font-size:31px;font-weight:900;color:#835500;text-shadow:var(--glowGold)}.meter{height:8px;background:rgba(148,163,184,.16);border-radius:9px;overflow:hidden;margin:8px 0}.meter div{height:100%;width:50%;border-radius:9px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));transition:.4s}
-.levelList{display:flex;flex-direction:column;gap:6px}.level{display:grid;grid-template-columns:72px 1fr 82px;gap:7px;align-items:center;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:8px}.level .k{font-size:10px;color:var(--muted)}.level .p{font-family:'JetBrains Mono';font-weight:900}.level .d{font-size:10px;text-align:left;color:var(--dim)}
-.reason,.plan,.helpNote,.targetCard{background:#fbfdff;border:1px solid var(--line);border-radius:11px;padding:9px;font-size:11px;color:#334155;line-height:1.65;margin-top:7px}.helpNote{border-style:dashed}.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);font-size:10px;color:var(--muted);background:#fff;margin:2px}
-.input{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:8px 10px;font-family:'JetBrains Mono';outline:none}.btn{width:100%;border:1px solid rgba(245,158,11,.40);background:linear-gradient(145deg,rgba(245,158,11,.18),rgba(245,158,11,.06));color:#835500;border-radius:11px;padding:9px 10px;font-weight:900;cursor:pointer;box-shadow:var(--shadow)}.btn.blue{color:#075985;border-color:rgba(0,184,230,.35);background:linear-gradient(145deg,rgba(0,184,230,.13),rgba(255,255,255,.8))}
-.miniTable{width:100%;border-collapse:collapse;font-size:11px}.miniTable th,.miniTable td{border-bottom:1px solid rgba(148,163,184,.16);padding:6px 4px;text-align:right}.miniTable th{color:var(--muted);font-weight:800}.miniTable td{font-family:'JetBrains Mono'}.footerWarn{font-size:10px;color:var(--dim);line-height:1.5;text-align:center;padding:4px 8px}
-.fullscreenChart{position:fixed!important;inset:0!important;height:100vh!important;width:100vw!important;z-index:999!important;background:linear-gradient(180deg,var(--bg),#e7edf5)}
-.fullscreenChart .chartArea{height:calc(100vh - 106px)!important}
-#exitFsBtn{display:none}
-#boxZoomBtn.active{color:#fff;background:linear-gradient(145deg,rgba(37,99,235,.88),rgba(0,184,230,.82));border-color:rgba(37,99,235,.72)}
-.selectionBox{position:absolute;border:2px dashed rgba(37,99,235,.95);background:rgba(37,99,235,.10);display:none;z-index:6;pointer-events:none;border-radius:8px}
-.guideModal{position:fixed;inset:0;background:rgba(15,23,42,.42);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1200;padding:16px}.guideModal.open{display:flex}
-.guideCard{width:min(1000px,96vw);max-height:88vh;overflow:auto;background:linear-gradient(180deg,#fff,#f5f8fb);border:1px solid var(--line);border-radius:18px;box-shadow:0 25px 60px rgba(15,23,42,.20);padding:16px}.guideHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.guideTitle{font-family:Orbitron;font-size:14px;color:#835500}.guideTable{width:100%;border-collapse:collapse}.guideTable th,.guideTable td{border-bottom:1px solid rgba(148,163,184,.20);padding:10px 8px;text-align:right;vertical-align:top}.guideTable th{position:sticky;top:0;background:#fff7e8;color:#835500;font-size:12px}.guideTable td{font-size:12px;line-height:1.7}.priorityNote{margin-top:10px;background:#fff;border:1px dashed var(--line2);border-radius:12px;padding:10px;color:#334155;font-size:12px}
-.priorityList{display:flex;flex-direction:column;gap:7px}.prioItem{display:grid;grid-template-columns:72px 1fr 54px;gap:7px;align-items:center;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:8px}.prioName{font-size:10px;color:var(--muted)}.prioTxt{font-family:'JetBrains Mono';font-weight:900;font-size:12px}.prioScore{font-family:'JetBrains Mono';font-weight:900;text-align:left}.scoreHigh{color:var(--green);text-shadow:0 0 8px rgba(22,163,74,.22)}.scoreMid{color:var(--yellow)}.scoreLow{color:var(--dim)}
+body{
+  font-family:Cairo,sans-serif;background:linear-gradient(180deg,#fff,#f3f6fa);color:var(--text);
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+}
+button,input,select{font-family:inherit}
+.app{height:100vh;display:grid;grid-template-rows:auto 1fr auto;min-height:0}
+.topbar{
+  height:78px;display:grid;grid-template-columns:1.35fr auto auto 1fr;align-items:center;gap:14px;padding:12px 24px;
+  border-bottom:1px solid var(--line);background:rgba(255,255,255,.92);backdrop-filter:blur(14px);z-index:20;
+}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}.logo{
+  width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:28px;font-weight:900;color:#9a6500;
+  border:1px solid rgba(183,121,0,.28);background:linear-gradient(145deg,#fff,#fff7e7);box-shadow:0 10px 22px rgba(183,121,0,.11);
+}
+.brand h1{font-size:22px;line-height:1;font-weight:900;letter-spacing:-.3px;white-space:nowrap}.brand h1 span{color:#9a6500}.brand p{font-size:12px;color:var(--muted);margin-top:6px;white-space:nowrap}
+.selectorRow{display:flex;gap:8px;align-items:center}.selectPill{
+  height:42px;padding:0 14px;border:1px solid var(--line);border-radius:14px;background:#fff;display:flex;align-items:center;gap:8px;
+  font-weight:800;box-shadow:0 6px 18px rgba(15,23,42,.04)
+}
+.btcMini{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#f7931a;color:#fff;font-weight:900}
+.priceBox{text-align:center;min-width:145px}.priceLbl{font-size:11px;color:var(--muted)}.livePrice{font-family:'JetBrains Mono';font-size:22px;font-weight:900;color:var(--green);line-height:1.08}.priceChange{font-size:12px;color:var(--green);font-family:'JetBrains Mono';margin-top:2px}
+.icons{display:flex;justify-content:flex-end;gap:13px;align-items:center}.iconBtn{width:36px;height:36px;border:0;background:transparent;color:#1f2937;font-size:22px;cursor:pointer}.hamb{font-size:26px}
+.main{
+  min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:14px;padding:14px 18px 10px 18px;background:linear-gradient(180deg,#f7fafc,#eef3f8);
+}
+.chartCard,.sideCard{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);min-height:0;overflow:hidden}
+.chartCard{position:relative;display:flex;flex-direction:column}
+.chartHead{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid rgba(217,226,236,.55);font-size:12px;color:var(--muted)}
+.indicators{display:flex;gap:14px;align-items:center;font-family:'JetBrains Mono';font-weight:800}.ema20{color:var(--orange)}.ema50{color:var(--blue)}.vwapC{color:var(--violet)}
+.chartStatus{display:flex;gap:12px;align-items:center}.statusPill{border:1px solid var(--line);border-radius:999px;padding:3px 8px;background:#fff;font-family:'JetBrains Mono';font-weight:800;color:var(--text)}
+.chartWrap{position:relative;flex:1;min-height:0;background:linear-gradient(180deg,#fff,#fbfdff)}
+#chart{width:100%;height:100%;display:block;cursor:crosshair}.selectionBox{position:absolute;border:2px dashed rgba(37,99,235,.95);background:rgba(37,99,235,.10);display:none;z-index:8;border-radius:8px;pointer-events:none}
+.cross{position:absolute;z-index:4;pointer-events:none;display:none}.cross.v{top:38px;bottom:0;width:1px;background:rgba(30,41,59,.12)}.cross.h{left:0;right:0;height:1px;background:rgba(30,41,59,.12)}
+.tooltip{position:absolute;z-index:10;display:none;pointer-events:none;background:rgba(255,255,255,.98);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font-family:'JetBrains Mono';font-size:11px;color:var(--text);box-shadow:var(--shadow2);direction:ltr;text-align:left;min-width:205px}
+.legend{height:34px;display:flex;gap:18px;align-items:center;padding:0 14px;border-top:1px solid rgba(217,226,236,.55);font-size:11px;color:var(--muted);overflow:auto;white-space:nowrap}
+.lg{display:flex;gap:7px;align-items:center}.sw{width:18px;height:8px;border-radius:3px}.sw.line{height:0;border-top:2px dashed #94a3b8;background:transparent}
+.sideCard{padding:14px;display:flex;flex-direction:column;gap:12px}
+.sideTitle{display:flex;align-items:center;gap:9px;margin:3px 0 4px 0}.targetIcon{width:28px;height:28px;border:2px solid #1f2937;border-radius:50%;position:relative}.targetIcon:before,.targetIcon:after{content:"";position:absolute;background:#1f2937}.targetIcon:before{width:2px;height:34px;left:11px;top:-5px}.targetIcon:after{height:2px;width:34px;left:-5px;top:11px}
+.sideTitle h2{font-size:16px;font-weight:900;line-height:1}.sideTitle small{font-size:11px;font-family:'JetBrains Mono';color:#111827}
+.prioList{display:flex;flex-direction:column;gap:10px}.prioCard{border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:#fff;display:grid;grid-template-columns:25px 1fr 46px;gap:8px;align-items:flex-start}
+.prioCard.red{background:linear-gradient(135deg,rgba(239,68,68,.065),#fff);border-color:rgba(239,68,68,.22)}.prioCard.orange{background:linear-gradient(135deg,rgba(245,158,11,.08),#fff);border-color:rgba(245,158,11,.25)}.prioCard.green{background:linear-gradient(135deg,rgba(34,197,94,.075),#fff);border-color:rgba(34,197,94,.25)}
+.num{font-family:'JetBrains Mono';font-size:19px;font-weight:900}.red .num{color:var(--red)}.orange .num{color:var(--orange)}.green .num{color:var(--green)}
+.prioMain b{font-size:13px}.prioMain .price{font-family:'JetBrains Mono';font-weight:900;margin-top:4px;color:#111827}.prioMain p{font-size:11px;color:#475569;line-height:1.55;margin-top:6px}
+.score{width:42px;height:42px;border-radius:9px;display:grid;place-items:center;color:#fff;font-family:'JetBrains Mono';font-weight:900;font-size:14px}.red .score{background:linear-gradient(145deg,#ef4444,#dc2626)}.orange .score{background:linear-gradient(145deg,#fbbf24,#f59e0b)}.green .score{background:linear-gradient(145deg,#22c55e,#16a34a)}
+.planBox{border:1px solid var(--line);border-radius:13px;padding:10px 11px;background:#fbfdff}.planBox h3{font-size:12px;margin-bottom:7px}.planGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.kv{display:flex;justify-content:space-between;font-size:11px;border-bottom:1px solid rgba(217,226,236,.55);padding:5px 0}.kv span:last-child{font-family:'JetBrains Mono';font-weight:900}
+.autoText{font-size:11px;color:var(--muted);display:flex;gap:7px;align-items:center;margin-top:2px}.spin{font-size:17px}
+.controls{
+  min-height:64px;display:grid;grid-template-columns:repeat(6,minmax(120px,1fr)) minmax(230px,1.1fr);gap:10px;padding:10px 18px 14px 18px;background:#f3f6fa;border-top:1px solid var(--line)
+}
+.ctrl{height:50px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 8px 20px rgba(15,23,42,.05);display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;color:#263244;font-weight:800}.ctrl small{display:block;font-size:10px;color:var(--muted);font-weight:600}.ctrl .ico{font-size:22px}.ctrl.gold .ico{background:#b77900;color:#fff;padding:2px 7px;border-radius:5px;font-size:14px}.ctrl.red{color:var(--red)}.ctrl.active{border-color:rgba(8,145,178,.45);background:linear-gradient(145deg,rgba(8,145,178,.10),#fff)}
+.landscapeTip{height:50px;border:1px solid var(--line);border-radius:14px;background:#fff;display:flex;gap:10px;align-items:center;justify-content:center;color:var(--muted);font-size:12px}.phoneIcon{width:34px;height:22px;border:2px solid #475569;border-radius:5px}
+.guideModal{position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}.guideModal.open{display:flex}.guideCard{width:min(1040px,96vw);max-height:88vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow2);padding:16px}.guideHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.guideTitle{font-weight:900;font-size:18px}.guideTable{width:100%;border-collapse:collapse}.guideTable th,.guideTable td{border-bottom:1px solid rgba(217,226,236,.85);padding:10px 8px;text-align:right;vertical-align:top;font-size:12px;line-height:1.65}.guideTable th{background:#fff7e7;color:#8a5600;position:sticky;top:0}.closeBtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:800}
+.fsExit{display:none}
+.fullscreenChart{position:fixed!important;inset:0!important;z-index:999!important;height:100vh!important;width:100vw!important;background:#f3f6fa;padding:8px!important}.fullscreenChart .chartCard{height:calc(100vh - 76px)}.fullscreenChart .sideCard{display:none}.fullscreenChart .main{display:block;padding:0}.fullscreenChart .controls{position:fixed;left:8px;right:8px;bottom:8px;z-index:1001;background:rgba(243,246,250,.72);backdrop-filter:blur(12px);border-radius:18px;grid-template-columns:repeat(6,minmax(92px,1fr));padding:8px}.fullscreenChart .landscapeTip{display:none}.fullscreenChart .fsExit{display:flex}
+@media(max-width:980px){
+ body{overflow:auto}.app{height:auto;min-height:100vh}.topbar{grid-template-columns:1fr;gap:8px;height:auto;text-align:center}.brand,.selectorRow,.icons{justify-content:center}.main{grid-template-columns:1fr}.chartCard{height:74vh;min-height:560px}.controls{grid-template-columns:repeat(2,1fr);}.landscapeTip{grid-column:1/-1}.brand h1{font-size:18px}.sideCard{min-height:auto}
+}
+@media(orientation:landscape) and (max-height:580px){.topbar{height:62px;padding:6px 14px}.brand p{display:none}.logo{width:42px;height:42px}.brand h1{font-size:18px}.controls{min-height:54px;padding:6px 12px}.ctrl,.landscapeTip{height:42px}.main{padding:8px 12px;gap:10px}}
 
-@media(max-width:1120px){body{overflow:auto}.app{height:auto;display:flex;flex-direction:column}.side,.right{overflow:visible;border:0}.center{height:76vh;min-height:630px}.header{grid-template-columns:1fr;gap:8px;height:auto;text-align:center}.brand,.tools{justify-content:center}.priceBox{min-width:0}.range{width:42vw}}
-@media(max-width:720px){.grid3{grid-template-columns:1fr 1fr}.livePrice{font-size:27px}.brand h1{font-size:13px}.legend{font-size:9px}.level{grid-template-columns:60px 1fr 70px}.side,.right{padding:8px}}
+/* V9 Hybrid Panels */
+.sideCard{overflow:auto}
+.panelTabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:#f3f6fa;border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:8px}
+.panelBtn{border:0;border-radius:10px;padding:8px 4px;background:transparent;color:var(--muted);font-size:11px;font-weight:900;cursor:pointer}
+.panelBtn.active{background:#fff;color:#8a5600;box-shadow:0 7px 16px rgba(15,23,42,.06);border:1px solid rgba(183,121,0,.18)}
+.panelPage{display:none;animation:fadeIn .18s ease}
+.panelPage.active{display:block}
+@keyframes fadeIn{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.panelSection{border:1px solid var(--line);background:#fbfdff;border-radius:14px;padding:10px;margin-bottom:10px}
+.panelSection h3{font-size:12px;margin-bottom:8px;color:#111827;display:flex;justify-content:space-between;align-items:center}
+.mtfGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mtfBox{border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px;text-align:center}
+.mtfBox .tfName{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);font-weight:900}
+.mtfBox .tfBias{font-size:14px;font-weight:900;margin-top:4px}
+.mtfBox .tfNote{font-size:9px;color:var(--dim);font-family:'JetBrains Mono';margin-top:3px}
+.metricGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.metricCard{border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px;min-height:58px}
+.metricCard small{font-size:9px;color:var(--muted)}
+.metricCard b{display:block;font-family:'JetBrains Mono';font-size:15px;margin-top:2px}
+.kvList{display:flex;flex-direction:column}
+.fullZones{display:flex;flex-direction:column;gap:6px}
+.zoneRow{display:grid;grid-template-columns:72px 1fr 42px;gap:6px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:11px;padding:7px}
+.zoneRow .zKind{font-size:10px;color:var(--muted);font-weight:800}.zoneRow .zPrice{font-family:'JetBrains Mono';font-weight:900;font-size:11px}.zoneRow .zScore{font-family:'JetBrains Mono';font-weight:900;text-align:center;border-radius:8px;color:#fff;padding:4px}
+.zScore.high{background:var(--green)}.zScore.mid{background:var(--orange)}.zScore.low{background:var(--dim)}
+.guideMini{font-size:12px;line-height:1.75;color:#334155}.guideMini b{color:#8a5600}
+.settingsGrid{display:grid;gap:8px}.settingsGrid label{font-size:10px;color:var(--muted);font-weight:700}.settingsGrid input{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:'JetBrains Mono';outline:none}.settingsGrid .setBtn{border:1px solid rgba(183,121,0,.28);border-radius:12px;background:linear-gradient(145deg,rgba(245,158,11,.12),#fff);padding:10px;font-weight:900;color:#8a5600;cursor:pointer}
+.ctrl.tabCtrl{border-color:rgba(8,145,178,.25)}
+@media(max-width:980px){
+  .panelTabs{position:sticky;top:0;z-index:5}
+  .sideCard{max-height:none}
+  .panelBtn{font-size:10px}
+}
+
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="brand"><div><h1>BTC PRO LIQUIDITY ENGINE V7</h1><p>Pro Clean • Priority Zones • Guide • Box Zoom • SL/TP</p></div><div class="coin">₿</div></div>
-  <div class="priceBox"><div class="livePrice" id="livePrice">---.--</div><div class="priceSub" id="priceSub">BTCUSD • M15</div></div>
-  <div class="tools">
-    <button class="hbtn" onclick="enableAlerts()">تفعيل التنبيهات</button>
-    <button class="hbtn" onclick="testArabicVoice()">اختبار الصوت</button>
-    <button class="hbtn" onclick="saveChartImage()">حفظ صورة HD</button>
-    <button class="hbtn" onclick="toggleFullscreenChart()">تكبير الشارت</button><button class="hbtn" onclick="openGuide()">دليل المناطق</button>
-    <div class="pill" id="timePill">--:--:--</div>
-    <div class="pill" id="sourcePill">METAAPI / MT5 <span class="dot"></span></div>
-  </div>
-</header>
-
-<main class="app" id="appShell">
-  <aside class="side">
-    <section class="section"><div class="stitle">لوحة الاتجاه العام</div>
-      <div class="grid2">
-        <div class="stat"><div class="n">D1</div><div class="v" id="biasD1">---</div><div class="small" id="biasD1s">---</div></div>
-        <div class="stat"><div class="n">H4</div><div class="v" id="biasH4">---</div><div class="small" id="biasH4s">---</div></div>
-        <div class="stat"><div class="n">H1</div><div class="v" id="biasH1">---</div><div class="small" id="biasH1s">---</div></div>
-        <div class="stat"><div class="n">M15</div><div class="v" id="biasM15">---</div><div class="small" id="biasM15s">---</div></div>
-      </div>
-      <div class="reason" id="topReason">يتم تحميل الفريمات لتحديد مزاج السوق.</div>
-    </section>
-
-    <section class="section"><div class="stitle">حالة المشترين والبائعين</div>
-      <div class="grid3">
-        <div class="stat"><div class="n">Buyers</div><div class="v green" id="buyersPct">--%</div><div class="small">آخر 30 شمعة</div></div>
-        <div class="stat"><div class="n">Sellers</div><div class="v red" id="sellersPct">--%</div><div class="small">ضغط بيع</div></div>
-        <div class="stat"><div class="n">Volume</div><div class="v yellow" id="volState">---</div><div class="small">نشاط</div></div>
-      </div>
-      <div class="row"><span class="lbl">VWAP</span><span class="val cyan" id="sideVWAP">---</span></div>
-      <div class="row"><span class="lbl">RSI 14</span><span class="val yellow" id="sideRSI">---</span></div>
-      <div class="row"><span class="lbl">ATR 14</span><span class="val violet" id="sideATR">---</span></div>
-      <div class="row"><span class="lbl">المزاج</span><span class="val" id="sideMood">---</span></div>
-    </section>
-
-    <section class="section"><div class="stitle">فلتر دخول سريع</div>
-      <div class="row"><span class="lbl">قرب دعم قوي</span><span class="val green" id="nearSupport">---</span></div>
-      <div class="row"><span class="lbl">قرب مقاومة قوية</span><span class="val red" id="nearResistance">---</span></div>
-      <div class="row"><span class="lbl">FVG غير ممسوحة</span><span class="val orange" id="fvgCount">---</span></div>
-      <div class="row"><span class="lbl">سيولة قريبة</span><span class="val yellow" id="liqNear">---</span></div>
-      <div class="reason" id="quickFilter">انتظر اكتمال البيانات.</div>
-      <div class="helpNote"><b>تفسير:</b> الأرقام هنا هي مسافات من السعر الحالي، وليست أسعارًا مستقلة. قرب دعم صغير = منطقة شراء محتملة. قرب مقاومة صغير = حذر من الشراء. FVG غير ممسوحة = مناطق قد يعود لها السعر. السيولة القريبة = Equal Highs/Lows قد يسحبها السعر.</div>
-    </section>
-
-    <section class="section"><div class="stitle">إعدادات الرسم والتنبيهات</div>
-      <div class="grid2">
-        <button class="btn" onclick="resetView()">ضبط الشارت</button>
-        <button class="btn" onclick="refreshAll()">تحديث الآن</button>
-        <button class="btn blue" onclick="saveChartImage()">حفظ PNG HD</button>
-        <button class="btn blue" onclick="toggleFullscreenChart()">Fullscreen</button>
-      </div>
-      <div style="height:8px"></div>
-      <label class="small">رمز MetaTrader / MetaAPI</label>
-      <input class="input" id="symbolInput" value="BTCUSD" placeholder="BTCUSD أو BTCUSDm"/>
-      <div style="height:6px"></div>
-      <label class="small">MetaAPI Proxy Endpoint</label>
-      <input class="input" id="endpointInput" value="/api/metaapi-candles" placeholder="/api/metaapi-candles"/>
-      <div style="height:8px"></div>
-      <button class="btn" onclick="changeSymbol()">تحميل من MetaAPI</button>
-      <div class="helpNote">التنبيه الصوتي يحتاج فتح الصفحة مرة والضغط على “تفعيل التنبيهات”. للتنبيه حتى عند إغلاق الواجهة استخدم Telegram Cron الموجود في الملف.</div>
-    </section>
-  </aside>
-
-  <section class="center" id="centerPanel">
-    <div class="tfbar">
-      <button class="tf" data-tf="M5">M5</button><button class="tf active" data-tf="M15">M15</button><button class="tf" data-tf="M30">M30</button><button class="tf" data-tf="H1">H1</button><button class="tf" data-tf="H4">H4</button><button class="tf" data-tf="D1">D1</button>
+<div class="app" id="appRoot">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">₿</div>
+      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9</span></h1><p>Clean Chart + Full Intelligence Panels</p></div>
     </div>
-    <div class="legend">
-      <span class="lg"><span class="box" style="background:var(--green)"></span>صاعدة</span>
-      <span class="lg"><span class="box" style="background:var(--red)"></span>هابطة</span>
-      <span class="lg"><span class="box" style="background:var(--buyZone);border:1px solid rgba(22,163,74,.45)"></span>Support Zone</span>
-      <span class="lg"><span class="box" style="background:var(--sellZone);border:1px solid rgba(220,38,38,.45)"></span>Resistance Zone</span>
-      <span class="lg"><span class="box" style="background:var(--fvgBull);border:1px solid rgba(0,184,230,.45)"></span>FVG Bull</span>
-      <span class="lg"><span class="box" style="background:var(--fvgBear);border:1px solid rgba(249,115,22,.45)"></span>FVG Bear</span>
-      <span class="lg"><span class="lineIcon" style="color:var(--yellow)"></span>Liquidity</span>
-      <span class="lg"><span class="solidIcon" style="color:var(--yellow)"></span>EMA20</span>
-      <span class="lg"><span class="solidIcon" style="color:var(--blue)"></span>EMA50</span>
-      <span class="lg"><span class="lineIcon" style="color:#64748b"></span>EMA200</span>
-      <span class="lg"><span class="lineIcon" style="color:var(--violet)"></span>VWAP</span>
-      <span class="lg"><span class="lineIcon" style="color:var(--green)"></span>Entry/TP</span>
-      <span class="lg"><span class="lineIcon" style="color:var(--red)"></span>SL</span>
-      <div class="toggles"><button class="tbtn on" data-toggle="trade">Trade Lines</button><button class="tbtn on" data-toggle="demandob">Demand OB</button><button class="tbtn on" data-toggle="supplyob">Supply OB</button><button class="tbtn on" data-toggle="vwap">VWAP</button><button class="tbtn on" data-toggle="ema">EMA</button><button class="tbtn on" data-toggle="liq">Liquidity</button><button class="tbtn on" data-toggle="bullfvg">Bull FVG</button><button class="tbtn on" data-toggle="bearfvg">Bear FVG</button><button class="tbtn on" data-toggle="sup">Support</button><button class="tbtn on" data-toggle="res">Resistance</button><button class="tbtn on" data-toggle="priority">Priority</button></div>
+    <div class="selectorRow">
+      <div class="selectPill"><span class="btcMini">₿</span><span id="symHead">BTCUSD</span>⌄</div>
+      <div class="selectPill"><span id="tfHead">M15</span>⌄</div>
     </div>
-    <div class="chartArea" id="chartArea">
-      <div class="chartTop">
-        <div class="badge">TF: <strong id="tfBadge">M15</strong> • Candles: <strong id="candleCount">---</strong></div>
-        <div class="badge">منطقة: <strong id="zoneBadge">---</strong> • Target: <strong id="targetBadge">---</strong></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="badgeBtn" onclick="saveChartImage()">حفظ HD</button>
-          <button class="badgeBtn" id="boxZoomBtn" onclick="toggleBoxZoom()">Box Zoom</button>
-          <button class="badgeBtn" onclick="resetView()">Reset</button>
-          <button class="badgeBtn" onclick="openGuide()">دليل</button>
-          <button class="badgeBtn" id="exitFsBtn" onclick="exitFullscreenChart()">خروج</button>
+    <div class="priceBox">
+      <div class="priceLbl">السعر الحالي</div>
+      <div class="livePrice" id="livePrice">---.-- ▲</div>
+      <div class="priceChange" id="priceSub">BTCUSD • M15</div>
+    </div>
+    <div class="icons">
+      <button class="iconBtn" onclick="enableAlerts()">♢</button>
+      <button class="iconBtn" onclick="saveChartImage()">☼</button>
+      <button class="iconBtn hamb" onclick="openGuide()">☰</button>
+    </div>
+  </header>
+
+  <main class="main" id="mainPanel">
+    <section class="chartCard" id="centerPanel">
+      <div class="chartHead">
+        <div class="indicators"><span class="ema20">EMA 20</span><span class="ema50">EMA 50</span><span class="vwapC">VWAP</span><span>◉</span></div>
+        <div class="chartStatus"><span>TF: <b id="tfBadge">M15</b></span><span class="statusPill">Candles: <span id="candleCount">---</span></span></div>
+      </div>
+      <div class="chartWrap" id="chartArea">
+        <canvas id="chart"></canvas>
+        <div class="selectionBox" id="selectionBox"></div>
+        <div class="cross v" id="crossV"></div><div class="cross h" id="crossH"></div><div class="tooltip" id="tip"></div>
+      </div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style="background:rgba(239,68,68,.55)"></span>مقاومة</span>
+        <span class="lg"><span class="sw" style="background:rgba(22,163,74,.55)"></span>دعم</span>
+        <span class="lg"><span class="sw" style="background:rgba(8,145,178,.45)"></span>FVG</span>
+        <span class="lg"><span class="sw" style="background:rgba(124,58,237,.35)"></span>OB</span>
+        <span class="lg"><span class="sw line"></span>سيولة</span>
+      </div>
+    </section>
+
+    <aside class="sideCard">
+      <div class="sideTitle"><div class="targetIcon"></div><div><h2>لوحات الذكاء والتحليل</h2><small>HYBRID INTELLIGENCE PANELS</small></div></div>
+
+      <div class="panelTabs">
+        <button class="panelBtn active" data-panel="market" onclick="setPanel('market')">Market</button>
+        <button class="panelBtn" data-panel="zones" onclick="setPanel('zones')">Zones</button>
+        <button class="panelBtn" data-panel="plan" onclick="setPanel('plan')">Plan</button>
+        <button class="panelBtn" data-panel="guide" onclick="setPanel('guide')">Guide</button>
+        <button class="panelBtn" data-panel="settings" onclick="setPanel('settings')">Settings</button>
+      </div>
+
+      <div class="panelPage active" id="panel-market">
+        <div class="panelSection">
+          <h3>Multi-Timeframe Bias <span id="topSummary" class="small">---</span></h3>
+          <div class="mtfGrid">
+            <div class="mtfBox"><div class="tfName">D1</div><div class="tfBias" id="biasD1">---</div><div class="tfNote" id="biasD1s">---</div></div>
+            <div class="mtfBox"><div class="tfName">H4</div><div class="tfBias" id="biasH4">---</div><div class="tfNote" id="biasH4s">---</div></div>
+            <div class="mtfBox"><div class="tfName">H1</div><div class="tfBias" id="biasH1">---</div><div class="tfNote" id="biasH1s">---</div></div>
+            <div class="mtfBox"><div class="tfName">M15</div><div class="tfBias" id="biasM15">---</div><div class="tfNote" id="biasM15s">---</div></div>
+          </div>
+        </div>
+
+        <div class="panelSection">
+          <h3>Market Status</h3>
+          <div class="metricGrid">
+            <div class="metricCard"><small>Buyers</small><b class="green" id="buyersPct">--%</b></div>
+            <div class="metricCard"><small>Sellers</small><b class="red" id="sellersPct">--%</b></div>
+            <div class="metricCard"><small>VWAP</small><b class="vwapC" id="sideVWAP">---</b></div>
+            <div class="metricCard"><small>RSI 14</small><b class="orange" id="sideRSI">---</b></div>
+            <div class="metricCard"><small>ATR 14</small><b class="blue" id="sideATR">---</b></div>
+            <div class="metricCard"><small>Mood</small><b id="sideMood">---</b></div>
+          </div>
+        </div>
+
+        <div class="panelSection">
+          <h3>Quick Entry Filter</h3>
+          <div class="kvList">
+            <div class="kv"><span>قرب دعم قوي</span><span id="nearSupport">---</span></div>
+            <div class="kv"><span>قرب مقاومة قوية</span><span id="nearResistance">---</span></div>
+            <div class="kv"><span>FVG غير ممسوحة</span><span id="fvgCount">---</span></div>
+            <div class="kv"><span>سيولة قريبة</span><span id="liqNear">---</span></div>
+          </div>
         </div>
       </div>
-      <canvas id="chart"></canvas>
-      <div class="selectionBox" id="selectionBox"></div>
-      <div class="cross v" id="crossV"></div><div class="cross h" id="crossH"></div><div class="tooltip" id="tip"></div>
-    </div>
-    <div class="zoomBar"><button class="zbtn" onclick="zoomIn()">＋</button><input class="range" id="zoomRange" type="range" min="40" max="280" value="150" oninput="setZoom(+this.value)"><button class="zbtn" onclick="zoomOut()">－</button><button class="zbtn" onclick="shiftView(-20)">◀</button><button class="zbtn" onclick="shiftView(20)">▶</button><button class="zbtn" onclick="toggleBoxZoom()">Box</button><button class="zbtn" onclick="openGuide()">Guide</button></div>
-  </section>
 
-  <aside class="right">
-    <section class="signal">
-      <div class="sigHead"><div><div class="small" style="letter-spacing:2px;font-family:Orbitron">MASTER DECISION</div><div class="sigDir" id="decision">WAIT</div><div class="small" id="decisionSub">لا تدخل قبل تأكيد المنطقة</div></div><div style="text-align:left"><div class="small">الثقة</div><div class="conf" id="confidence">--%</div><div class="small" id="scoreText">Score --/100</div></div></div>
-      <div class="meter"><div id="scoreBar"></div></div><div id="decisionTags"><span class="tag">تحميل...</span></div>
-    </section>
-    <section class="section"><div class="stitle">Priority Zones</div><div class="priorityList" id="priorityList"><div class="reason">يتم حساب الأولوية حسب قرب المنطقة من السعر وقوتها.</div></div></section>
-    <section class="section"><div class="stitle">مناطق الدعم والمقاومة الدقيقة</div><div class="levelList" id="levelsList"></div></section>
-    <section class="section"><div class="stitle">FVG والسيولة</div>
-      <div class="grid2"><div class="stat"><div class="n">Bullish FVG</div><div class="v cyan" id="bullFVG">0</div><div class="small">أسفل/قريب</div></div><div class="stat"><div class="n">Bearish FVG</div><div class="v orange" id="bearFVG">0</div><div class="small">أعلى/قريب</div></div><div class="stat"><div class="n">Equal Highs</div><div class="v yellow" id="eqHighs">0</div><div class="small">سيولة شراء فوق</div></div><div class="stat"><div class="n">Equal Lows</div><div class="v yellow" id="eqLows">0</div><div class="small">سيولة بيع تحت</div></div></div>
-      <table class="miniTable" style="margin-top:7px"><thead><tr><th>نوع</th><th>من</th><th>إلى</th><th>حالة</th></tr></thead><tbody id="fvgTable"></tbody></table>
-    </section>
-    <section class="section"><div class="stitle">هدف الحركة السعري و RR</div>
-      <div class="targetCard">
-        <div class="row"><span class="lbl">الاتجاه المرجح</span><span class="val" id="moveDir">---</span></div>
-        <div class="row"><span class="lbl">Entry</span><span class="val green" id="setupEntry">---</span></div>
-        <div class="row"><span class="lbl">SL</span><span class="val red" id="setupSL">---</span></div>
-        <div class="row"><span class="lbl">TP1 / TP2</span><span class="val cyan" id="setupTP">---</span></div>
-        <div class="row"><span class="lbl">R:R</span><span class="val yellow" id="setupRR">---</span></div>
-        <div class="row"><span class="lbl">سبب الهدف</span><span class="val" id="moveReason">---</span></div>
+      <div class="panelPage" id="panel-zones">
+        <div class="panelSection">
+          <h3>Priority Zones <span id="zoneMode" class="small">Score</span></h3>
+          <div class="prioList" id="priorityCards">
+            <div class="prioCard red"><div class="num">1</div><div class="prioMain"><b>تحميل...</b><div class="price">---</div><p>يتم حساب المناطق تلقائيًا.</p></div><div class="score">--</div></div>
+          </div>
+          <div class="autoText"><span class="spin">↻</span><span id="autoText">يتم تحديث المناطق تلقائيًا</span></div>
+        </div>
+        <div class="panelSection">
+          <h3>All Important Zones</h3>
+          <div class="fullZones" id="allZonesList"></div>
+        </div>
       </div>
-    </section>
-    <section class="section"><div class="stitle">خطة التداول المقترحة</div><div class="actionPlan" id="tradePlan"></div><div class="footerWarn">ليست توصية مالية. استخدم إدارة مخاطر ولا تدخل أثناء الأخبار أو السبريد العالي.</div></section>
-    <section class="section"><div class="stitle">حاسبة مخاطرة سريعة</div><div class="grid2"><div><label class="small">رصيد الحساب $</label><input class="input" id="acc" value="3000" oninput="calcRisk()"></div><div><label class="small">مخاطرة %</label><input class="input" id="risk" value="1" oninput="calcRisk()"></div></div><div style="height:6px"></div><div class="grid2"><div><label class="small">SL بالدولار</label><input class="input" id="slDist" value="400" oninput="calcRisk()"></div><div><label class="small">قيمة 1 lot</label><input class="input" id="lotValue" value="1" oninput="calcRisk()"></div></div><div class="reason" id="riskOut">---</div></section>
-  </aside>
-</main>
 
+      <div class="panelPage" id="panel-plan">
+        <div class="planBox">
+          <h3>خطة التداول الكاملة</h3>
+          <div class="planGrid">
+            <div class="kv"><span>Decision</span><span id="decision">WAIT</span></div>
+            <div class="kv"><span>Confidence</span><span id="confidence">--%</span></div>
+            <div class="kv"><span>Entry</span><span id="setupEntry">---</span></div>
+            <div class="kv"><span>SL</span><span id="setupSL">---</span></div>
+            <div class="kv"><span>TP1</span><span id="setupTP1">---</span></div>
+            <div class="kv"><span>TP2</span><span id="setupTP2">---</span></div>
+            <div class="kv"><span>R:R</span><span id="setupRR">---</span></div>
+            <div class="kv"><span>Target Reason</span><span id="targetReason">---</span></div>
+          </div>
+        </div>
+        <div class="panelSection">
+          <h3>Trade Narrative</h3>
+          <div class="guideMini" id="tradeNarrative">---</div>
+        </div>
+      </div>
+
+      <div class="panelPage" id="panel-guide">
+        <div class="panelSection">
+          <h3>دليل سريع</h3>
+          <div class="guideMini">
+            <b>Support Block:</b> منطقة شراء محتملة عند ظهور رفض.<br>
+            <b>Resistance Block:</b> منطقة جني أرباح أو رفض صاعد.<br>
+            <b>Bull FVG:</b> Pullback محتمل للشراء.<br>
+            <b>Bear FVG:</b> تحذير من استمرار الشراء أو فرصة بيع.<br>
+            <b>OB:</b> منطقة مؤسسية تقوى عند توافقها مع S/R أو FVG.<br>
+            <b>Liquidity:</b> مناطق جذب قد يسحبها السعر قبل الانعكاس.
+          </div>
+          <button class="ctrl" style="width:100%;margin-top:10px" onclick="openGuide()">فتح الدليل الكامل</button>
+        </div>
+      </div>
+
+      <div class="panelPage" id="panel-settings">
+        <div class="panelSection">
+          <h3>Settings</h3>
+          <div class="settingsGrid">
+            <div><label>MetaTrader Symbol</label><input id="symbolInput" value="BTCUSD"></div>
+            <div><label>MetaAPI Proxy Endpoint</label><input id="endpointInput" value="/api/metaapi-candles"></div>
+            <button class="setBtn" onclick="changeSymbol()">تحميل من MetaAPI</button>
+            <button class="setBtn" onclick="refreshAll()">تحديث الآن</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="controls">
+    <button class="ctrl tabCtrl" onclick="setPanel('market')"><span class="ico">▦</span><span>السوق<small>Market</small></span></button>
+    <button class="ctrl tabCtrl" onclick="setPanel('zones')"><span class="ico">◎</span><span>المناطق<small>Zones</small></span></button>
+    <button class="ctrl tabCtrl" onclick="setPanel('plan')"><span class="ico">↗</span><span>الخطة<small>Plan</small></span></button>
+    <button class="ctrl" id="autoBtn" onclick="toggleAutoFocus()"><span class="ico">◉</span><span>تركيز تلقائي<small>Auto Focus</small></span></button>
+    <button class="ctrl" id="boxZoomBtn" onclick="toggleBoxZoom()"><span class="ico">⌕</span><span>تكبير منطقة<small>Box Zoom</small></span></button>
+    <button class="ctrl gold" onclick="saveChartImage()"><span class="ico">HD</span><span>حفظ HD<small>Save HD</small></span></button>
+    <div class="landscapeTip"><div class="phoneIcon"></div><div>يفضل استخدام الوضع الأفقي<br><small>لأفضل تجربة على الجوال</small></div></div>
+  </footer>
+</div>
 
 <div class="guideModal" id="guideModal">
   <div class="guideCard">
-    <div class="guideHead">
-      <div>
-        <div class="guideTitle">دليل المناطق وخطوط القرار</div>
-        <div class="small">يفتح من خارج الشارت ويشرح كيف تتفاعل المناطق مع السعر.</div>
-      </div>
-      <button class="badgeBtn" onclick="closeGuide()">إغلاق</button>
-    </div>
+    <div class="guideHead"><div class="guideTitle">دليل المناطق وخطوط القرار</div><button class="closeBtn" onclick="closeGuide()">إغلاق</button></div>
     <table class="guideTable">
       <thead><tr><th>العنصر</th><th>المعنى</th><th>ماذا يفعل بالسعر؟</th><th>الاستخدام العملي</th></tr></thead>
       <tbody>
-        <tr><td><b>Support Block</b></td><td>منطقة طلب/دعم من ارتدادات أو قيعان سابقة.</td><td>قد يبطّئ الهبوط أو يسبب ارتدادًا إذا ظهرت شموع رفض.</td><td>منطقة مراقبة للشراء، وليس شراء عشوائي.</td></tr>
-        <tr><td><b>Resistance Block</b></td><td>منطقة عرض/مقاومة من قمم سابقة.</td><td>قد توقف الصعود أو تجذب جني أرباح.</td><td>لا تطارد الشراء قربها إلا بعد اختراق وثبات.</td></tr>
-        <tr><td><b>Bull FVG</b></td><td>فجوة قيمة عادلة صاعدة.</td><td>قد يعود السعر لملئها ثم يتابع الصعود.</td><td>Pullback شراء عند التوافق مع دعم/OB.</td></tr>
-        <tr><td><b>Bear FVG</b></td><td>فجوة قيمة عادلة هابطة.</td><td>قد يعود السعر لها ثم يرفضها هبوطًا.</td><td>منطقة بيع أو تحذير من استمرار الشراء.</td></tr>
-        <tr><td><b>Demand OB</b></td><td>آخر منطقة بيع قبل اندفاع صاعد.</td><td>قد تعمل كدعم مؤسسي عند العودة.</td><td>تزيد قوة سيناريو الشراء.</td></tr>
-        <tr><td><b>Supply OB</b></td><td>آخر منطقة شراء قبل اندفاع هابط.</td><td>قد تعمل كمقاومة مؤسسية.</td><td>تزيد قوة سيناريو البيع أو جني الأرباح.</td></tr>
-        <tr><td><b>Liquidity</b></td><td>تجمع أوامر/ستوبات قرب قمم وقيعان.</td><td>السعر قد يسحبها قبل الانعكاس أو الاستمرار.</td><td>مهم لتجنب الدخول قبل Stop Hunt.</td></tr>
-        <tr><td><b>VWAP</b></td><td>متوسط السعر المرجّح بالحجم.</td><td>فوقه أفضلية للمشترين، تحته للبائعين.</td><td>فلتر اتجاه سريع.</td></tr>
-        <tr><td><b>Priority Score</b></td><td>درجة أهمية المنطقة.</td><td>كلما كانت أقرب وأقوى تظهر أكثر وضوحًا.</td><td>ابدأ من أعلى 3 مناطق في اللوحة.</td></tr>
+        <tr><td><b>Support Block</b></td><td>منطقة طلب/دعم من قيعان أو ارتدادات.</td><td>قد يبطئ الهبوط أو يسبب ارتدادًا.</td><td>انتظار رفض سعري قبل الشراء.</td></tr>
+        <tr><td><b>Resistance Block</b></td><td>منطقة عرض/مقاومة من قمم سابقة.</td><td>قد توقف الصعود أو تجذب جني أرباح.</td><td>لا تطارد الشراء قربها إلا بعد اختراق.</td></tr>
+        <tr><td><b>Bull FVG</b></td><td>فجوة قيمة عادلة صاعدة.</td><td>قد يعود السعر لملئها ثم يتابع الصعود.</td><td>منطقة Pullback محتملة.</td></tr>
+        <tr><td><b>Bear FVG</b></td><td>فجوة قيمة عادلة هابطة.</td><td>قد تعطي رفضًا هابطًا عند العودة لها.</td><td>تحذير للشراء أو فرصة بيع.</td></tr>
+        <tr><td><b>OB</b></td><td>Order Block مؤسسي.</td><td>قد يعمل كدعم/مقاومة قوية.</td><td>يزيد قوة المنطقة إذا تزامن مع S/R أو FVG.</td></tr>
+        <tr><td><b>Liquidity</b></td><td>تجمع ستوبات فوق قمم أو تحت قيعان.</td><td>قد يسحبها السعر قبل الانعكاس.</td><td>تجنب الدخول قبل Stop Hunt.</td></tr>
+        <tr><td><b>Priority Score</b></td><td>درجة أهمية المنطقة حسب القرب والقوة.</td><td>High تظهر أوضح؛ Low تبقى خفيفة.</td><td>ابدأ من أعلى 3 مناطق في اللوحة.</td></tr>
       </tbody>
     </table>
-    <div class="priorityNote"><b>مبدأ V7:</b> لا يتم حذف المناطق البعيدة. يتم فقط تخفيفها، بينما المناطق القريبة/القوية تظهر بحدود أوضح ودرجة أعلى في Priority Zones.</div>
   </div>
 </div>
 
@@ -220,215 +299,129 @@ const LIMIT=500;
 let symbol=localStorage.getItem('btc_meta_symbol')||'BTCUSD';
 let metaEndpoint=localStorage.getItem('btc_meta_endpoint')||'/api/metaapi-candles';
 let currentTF='M15', candles=[], tfCache={}, analysis=null, tradeSetup=null;
-let overlays={sup:true,res:true,bullfvg:true,bearfvg:true,liq:true,ema:true,vwap:true,demandob:true,supplyob:true,trade:true,priority:true};
-let viewCount=150, viewOffset=0, alertEnabled=false, lastAlertKey='', lastAlertTime=0, chartSideMgr=null, chartGeom=null, boxZoomMode=false, selectState=null;
+let viewCount=150, viewOffset=0, alertEnabled=false, lastAlertKey='', lastAlertTime=0;
+let autoFocus=false, boxZoomMode=false, selectState=null, chartGeom=null;
 const $=id=>document.getElementById(id);
 const fmt=(n,d=2)=>Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d}):'---';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
-function css(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim();}
-function nowTime(){ $('timePill').textContent=new Date().toLocaleTimeString('en-GB'); }
-setInterval(nowTime,1000); nowTime();
-window.addEventListener('DOMContentLoaded',()=>{ $('symbolInput').value=symbol; $('endpointInput').value=metaEndpoint; registerSW(); });
-document.querySelectorAll('.tf').forEach(b=>b.addEventListener('click',()=>{currentTF=b.dataset.tf;document.querySelectorAll('.tf').forEach(x=>x.classList.toggle('active',x.dataset.tf===currentTF));$('tfBadge').textContent=currentTF;viewOffset=0;loadTF(currentTF,true);}));
-document.querySelectorAll('.tbtn').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.toggle;overlays[k]=!overlays[k];b.classList.toggle('on',overlays[k]);draw();}));
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function normalizeCandle(k){if(Array.isArray(k)) return {t:+k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+(k[5]||0)}; const t=k.time?new Date(k.time).getTime():(k.brokerTime?new Date(k.brokerTime.replace(' ','T')+'Z').getTime():Date.now()); return {t,o:+k.open,h:+k.high,l:+k.low,c:+k.close,v:+(k.tickVolume??k.volume??0)};}
+async function fetchCandles(tf){
+  const timeframe=TF_MAP[tf]||'15m';const sep=metaEndpoint.includes('?')?'&':'?';const url=`${metaEndpoint}${sep}symbol=${encodeURIComponent(symbol)}&timeframe=${encodeURIComponent(timeframe)}&limit=${LIMIT}`;
+  try{const r=await fetch(url,{cache:'no-store'});const payload=await r.json().catch(()=>null);if(!r.ok)throw new Error((payload&&payload.error)||('HTTP '+r.status));const data=Array.isArray(payload)?payload:(payload.candles||payload.data||[]);const out=data.map(normalizeCandle).filter(x=>Number.isFinite(x.o)&&Number.isFinite(x.h)&&Number.isFinite(x.l)&&Number.isFinite(x.c));if(!out.length)throw new Error('No candles');return out.sort((a,b)=>a.t-b.t);}
+  catch(e){console.warn(e);return demoCandles(tf);}
+}
+function demoCandles(tf){const ms={M5:300000,M15:900000,M30:1800000,H1:3600000,H4:14400000,D1:86400000}[tf]||900000;let out=[],p=62000,now=Date.now()-LIMIT*ms;for(let i=0;i<LIMIT;i++){const drift=Math.sin(i/23)*35+Math.sin(i/70)*80,shock=(Math.random()-.48)*220,o=p,c=p+drift*.08+shock,h=Math.max(o,c)+Math.random()*160,l=Math.min(o,c)-Math.random()*160,v=100+Math.random()*900+(Math.abs(c-o)>140?700:0);out.push({t:now+i*ms,o,h,l,c,v});p=c;}return out;}
+async function loadTF(tf,force=false){if(!force&&tfCache[tf]){candles=tfCache[tf];updateAll();return;}candles=await fetchCandles(tf);tfCache[tf]=candles;updateAll();}
+async function refreshAll(){tfCache={};await Promise.all(['D1','H4','H1','M15',currentTF].map(async tf=>{tfCache[tf]=await fetchCandles(tf)}));candles=tfCache[currentTF];updateAll();}
+function ema(values,p){let k=2/(p+1),out=[],prev=values[0];for(let i=0;i<values.length;i++){prev=i===0?values[i]:values[i]*k+prev*(1-k);out.push(prev)}return out}
+function calcATR(cs,p=14){let tr=[];for(let i=0;i<cs.length;i++){tr.push(i===0?cs[i].h-cs[i].l:Math.max(cs[i].h-cs[i].l,Math.abs(cs[i].h-cs[i-1].c),Math.abs(cs[i].l-cs[i-1].c)))}return ema(tr,p)}
+function calcRSI(cs,p=14){let out=new Array(cs.length).fill(50),g=0,l=0;for(let i=1;i<cs.length;i++){let d=cs[i].c-cs[i-1].c;if(i<=p){if(d>=0)g+=d;else l-=d;if(i===p){g/=p;l/=p;out[i]=100-100/(1+g/(l||1e-9))}}else{g=(g*(p-1)+Math.max(d,0))/p;l=(l*(p-1)+Math.max(-d,0))/p;out[i]=100-100/(1+g/(l||1e-9))}}return out}
+function calcVWAP(cs){let pv=0,v=0,out=[];for(const x of cs){const tp=(x.h+x.l+x.c)/3;pv+=tp*x.v;v+=x.v;out.push(pv/(v||1))}return out}
+function pivotPoints(cs,windows=[2,3,5]){const highs=[],lows=[];windows.forEach(w=>{for(let i=w;i<cs.length-w;i++){let H=true,L=true;for(let j=i-w;j<=i+w;j++){if(j===i)continue;if(cs[j].h>=cs[i].h)H=false;if(cs[j].l<=cs[i].l)L=false}if(H)highs.push({i,price:cs[i].h,from:Math.max(cs[i].o,cs[i].c),to:cs[i].h,w});if(L)lows.push({i,price:cs[i].l,from:cs[i].l,to:Math.min(cs[i].o,cs[i].c),w})}});return{highs,lows}}
+function clusterZones(points,tol,max=6){const clusters=[];points.slice(-180).forEach(p=>{let c=clusters.find(x=>Math.abs(x.price-p.price)<=tol);if(!c)clusters.push({price:p.price,top:p.to,bottom:p.from,points:[p],last:p.i});else{c.points.push(p);c.price=avg(c.points.map(q=>q.price));c.top=Math.max(c.top,p.to);c.bottom=Math.min(c.bottom,p.from);c.last=Math.max(c.last,p.i)}});clusters.forEach(c=>{c.touches=c.points.length;c.strength=c.touches*18+c.last/30;c.upper=Math.max(c.top,c.price+tol*.18);c.lower=Math.min(c.bottom,c.price-tol*.18)});return clusters.sort((a,b)=>b.strength-a.strength).slice(0,max)}
+function detectFVG(cs,atr){const res=[];for(let i=2;i<cs.length;i++){const a=cs[i-2],c=cs[i];if(c.l>a.h){const from=a.h,to=c.l;if(to-from>atr*.14)res.push({type:'BULL',from,to,mid:(from+to)/2,i:i-2,end:i,mitigated:cs.slice(i+1).some(x=>x.l<=from)})}if(c.h<a.l){const from=c.h,to=a.l;if(to-from>atr*.14)res.push({type:'BEAR',from,to,mid:(from+to)/2,i:i-2,end:i,mitigated:cs.slice(i+1).some(x=>x.h>=to)})}}return res.filter(x=>!x.mitigated).slice(-14)}
+function detectLiquidity(sup,res,price,atr){const liq=[];res.forEach(l=>{if(l.touches>=2)liq.push({type:'BUY LIQ',price:l.price,side:'above',dist:l.price-price,points:l.touches})});sup.forEach(l=>{if(l.touches>=2)liq.push({type:'SELL LIQ',price:l.price,side:'below',dist:price-l.price,points:l.touches})});return liq.filter(x=>Math.abs(x.dist)<atr*12).sort((a,b)=>Math.abs(a.dist)-Math.abs(b.dist))}
+function detectOB(cs,atrA){let obs=[];for(let i=3;i<cs.length;i++){const imp=Math.abs(cs[i].c-cs[i-1].c);if(imp>atrA[i]*1.15){if(cs[i].c>cs[i].o){let j=i-1;while(j>1&&cs[j].c>=cs[j].o)j--;obs.push({type:'DEMAND',i:j,from:cs[j].l,to:Math.max(cs[j].o,cs[j].c),end:i})}else{let j=i-1;while(j>1&&cs[j].c<=cs[j].o)j--;obs.push({type:'SUPPLY',i:j,from:Math.min(cs[j].o,cs[j].c),to:cs[j].h,end:i})}}}return obs.slice(-10)}
+function projectedMove(last,sup,res,liq,fvg,atr,decision){const above=[],below=[];res.forEach(z=>above.push({price:z.price,reason:`R ${fmt(z.price,0)}`}));sup.forEach(z=>below.push({price:z.price,reason:`S ${fmt(z.price,0)}`}));liq.forEach(l=>(l.price>last.c?above:below).push({price:l.price,reason:l.type}));fvg.forEach(g=>{if(g.type==='BEAR'&&g.from>last.c)above.push({price:g.mid,reason:'Bear FVG'});if(g.type==='BULL'&&g.to<last.c)below.push({price:g.mid,reason:'Bull FVG'})});above.sort((a,b)=>a.price-b.price);below.sort((a,b)=>b.price-a.price);const up=above[0]||{price:last.c+atr*1.8,reason:'ATR'},dn=below[0]||{price:last.c-atr*1.8,reason:'ATR'};if(decision==='BUY')return{dir:'UP',target:up.price,move:up.price-last.c,reason:up.reason};if(decision==='SELL')return{dir:'DOWN',target:dn.price,move:last.c-dn.price,reason:dn.reason};return(up.price-last.c)<(last.c-dn.price)?{dir:'UP',target:up.price,move:up.price-last.c,reason:up.reason}:{dir:'DOWN',target:dn.price,move:last.c-dn.price,reason:dn.reason}}
+function makeTradeSetup(a){const p=a.last.c,atr=a.atrLast,s=a.levels.sup[0],r=a.levels.res[0],m=a.projected;let dir=a.decision==='SELL'?'SELL':'BUY';if(a.decision==='WAIT')dir=m.dir==='DOWN'?'SELL':'BUY';if(dir==='BUY'){const entry=s?Math.max(s.price,p-atr*1.05):p,sl=(s?s.lower:entry)-atr*.45,tp1=m.target>entry?m.target:entry+atr*1.5,tp2=tp1+atr*1.15,rr=(tp1-entry)/Math.max(entry-sl,1);return{dir,entry,sl,tp1,tp2,rr}}const entry=r?Math.min(r.price,p+atr*1.05):p,sl=(r?r.upper:entry)+atr*.45,tp1=m.target<entry?m.target:entry-atr*1.5,tp2=tp1-atr*1.15,rr=(entry-tp1)/Math.max(sl-entry,1);return{dir,entry,sl,tp1,tp2,rr}}
+function analyze(cs){if(cs.length<60)return null;const closes=cs.map(x=>x.c),vols=cs.map(x=>x.v),e20=ema(closes,20),e50=ema(closes,50),e200=ema(closes,200),atr=calcATR(cs,14),rsi=calcRSI(cs,14),vwap=calcVWAP(cs),last=cs.at(-1),atrLast=atr.at(-1);const pv=pivotPoints(cs),tol=Math.max(atrLast*.26,last.c*.0009),res=clusterZones(pv.highs,tol,7).filter(x=>x.price>last.c-atrLast*2.5).sort((a,b)=>a.price-b.price),sup=clusterZones(pv.lows,tol,7).filter(x=>x.price<last.c+atrLast*2.5).sort((a,b)=>b.price-a.price),fvg=detectFVG(cs,atrLast),liq=detectLiquidity(sup,res,last.c,atrLast),ob=detectOB(cs,atr);const recent=cs.slice(-30),buy=recent.filter(x=>x.c>=x.o).reduce((s,x)=>s+x.v,0),sell=recent.filter(x=>x.c<x.o).reduce((s,x)=>s+x.v,0),buyers=buy/(buy+sell||1)*100;let score=50;if(last.c>e20.at(-1))score+=8;else score-=8;if(last.c>e50.at(-1))score+=12;else score-=12;if(last.c>e200.at(-1))score+=10;else score-=10;if(e20.at(-1)>e50.at(-1))score+=8;else score-=8;if(last.c>vwap.at(-1))score+=8;else score-=8;if(rsi.at(-1)>56)score+=8;if(rsi.at(-1)<44)score-=8;if(buyers>56)score+=8;if(buyers<44)score-=8;score=clamp(Math.round(score),0,100);let decision='WAIT',mood='محايد';if(score>=67){decision='BUY';mood='مزاج شراء'}else if(score<=33){decision='SELL';mood='مزاج بيع'}const zone=sup[0]&&res[0]?(last.c<(sup[0].price+res[0].price)/2?'قريب من الدعم':'قريب من المقاومة'):'غير محدد',projected=projectedMove(last,sup,res,liq,fvg,atrLast,decision);return{cs,last,closes,e20,e50,e200,atr,rsi,vwap,levels:{sup,res},fvg,liq,ob,buyers,sellers:100-buyers,score,decision,mood,zone,atrLast,projected}}
+function zoneScore(kind,low,high,touches=0){const p=analysis?.last?.c??((low+high)/2),atr=Math.max(1,analysis?.atrLast||1),mid=(low+high)/2,dist=Math.abs(mid-p)/atr;let s=dist<.55?96:dist<1?84:dist<1.8?68:dist<3?50:34;s+=Math.min(10,(touches||0)*3);if(kind.includes('Liquidity'))s+=4;return clamp(Math.round(s),18,100)}
+function collectZones(){if(!analysis)return[];const out=[];analysis.levels.res.slice(0,5).forEach((z,i)=>out.push({kind:'مقاومة رئيسية',code:`R${i+1}`,low:z.lower,high:z.upper,price:z.price,score:zoneScore('Resistance',z.lower,z.upper,z.touches),class:'red',action:'منطقة بيع قوية، احتمال ارتداد عالٍ'}));analysis.levels.sup.slice(0,5).forEach((z,i)=>out.push({kind:'دعم رئيسي',code:`S${i+1}`,low:z.lower,high:z.upper,price:z.price,score:zoneScore('Support',z.lower,z.upper,z.touches),class:'green',action:'منطقة شراء قوية، انتظر رفض السعر'}));analysis.fvg.slice(-8).forEach(g=>out.push({kind:'فجوة قيمة',code:g.type==='BULL'?'Bull FVG':'Bear FVG',low:g.from,high:g.to,price:g.mid,score:zoneScore('FVG',g.from,g.to,0),class:g.type==='BULL'?'green':'orange',action:'منطقة توازن محتملة، راقب رد فعل السعر'}));analysis.ob.slice(-6).forEach(o=>out.push({kind:o.type==='DEMAND'?'Demand OB':'Supply OB',code:o.type==='DEMAND'?'D-OB':'S-OB',low:o.from,high:o.to,price:(o.from+o.to)/2,score:zoneScore('OB',o.from,o.to,0),class:o.type==='DEMAND'?'green':'red',action:'Order Block مهم عند التوافق مع السيولة'}));analysis.liq.slice(0,6).forEach(l=>out.push({kind:'سيولة',code:l.type,low:l.price,high:l.price,price:l.price,score:zoneScore('Liquidity',l.price,l.price,l.points||0),class:'orange',action:'قد يسحبها السعر قبل الانعكاس'}));return out.sort((a,b)=>b.score-a.score)}
 
-function normalizeCandle(k){ if(Array.isArray(k)) return {t:+k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+(k[5]||0)}; const t=k.time?new Date(k.time).getTime():(k.brokerTime?new Date(k.brokerTime.replace(' ','T')+'Z').getTime():Date.now()); return {t,o:+k.open,h:+k.high,l:+k.low,c:+k.close,v:+(k.tickVolume??k.volume??0)}; }
-async function fetchCandles(tf){ const timeframe=TF_MAP[tf]||'15m'; const sep=metaEndpoint.includes('?')?'&':'?'; const url=`${metaEndpoint}${sep}symbol=${encodeURIComponent(symbol)}&timeframe=${encodeURIComponent(timeframe)}&limit=${LIMIT}`;
-  try{ $('sourcePill').innerHTML='METAAPI / MT5 <span class="dot"></span>'; const r=await fetch(url,{cache:'no-store'}); const payload=await r.json().catch(()=>null); if(!r.ok) throw new Error((payload&&payload.error)||('HTTP '+r.status)); const data=Array.isArray(payload)?payload:(payload.candles||payload.data||[]); const out=data.map(normalizeCandle).filter(x=>Number.isFinite(x.o)&&Number.isFinite(x.h)&&Number.isFinite(x.l)&&Number.isFinite(x.c)); if(!out.length) throw new Error('No candles returned'); return out.sort((a,b)=>a.t-b.t); }
-  catch(e){ console.warn(e); $('sourcePill').innerHTML='METAAPI ERROR • DEMO <span class="dot" style="background:var(--red);box-shadow:0 0 10px var(--red)"></span>'; return demoCandles(tf); }
+function setPanel(name){
+  document.querySelectorAll('.panelPage').forEach(p=>p.classList.toggle('active',p.id===`panel-${name}`));
+  document.querySelectorAll('.panelBtn').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));
+  setTimeout(draw,60);
 }
-function demoCandles(tf){ const ms={M5:300000,M15:900000,M30:1800000,H1:3600000,H4:14400000,D1:86400000}[tf]||900000; let out=[],p=62000; const now=Date.now()-LIMIT*ms; for(let i=0;i<LIMIT;i++){const drift=Math.sin(i/23)*35+Math.sin(i/70)*80; const shock=(Math.random()-.48)*220; const o=p,c=p+drift*.08+shock,h=Math.max(o,c)+Math.random()*160,l=Math.min(o,c)-Math.random()*160,v=100+Math.random()*900+(Math.abs(c-o)>140?700:0); out.push({t:now+i*ms,o,h,l,c,v});p=c;} return out; }
-async function loadTF(tf,force=false){ if(!force && tfCache[tf]){candles=tfCache[tf];updateAll();return;} candles=await fetchCandles(tf); tfCache[tf]=candles; updateAll(); }
-async function refreshAll(){ tfCache={}; await Promise.all(['D1','H4','H1','M15',currentTF].map(async tf=>{tfCache[tf]=await fetchCandles(tf)})); candles=tfCache[currentTF]; updateAll(); }
-function changeSymbol(){ symbol=$('symbolInput').value.trim().toUpperCase()||'BTCUSD'; metaEndpoint=$('endpointInput').value.trim()||'/api/metaapi-candles'; localStorage.setItem('btc_meta_symbol',symbol); localStorage.setItem('btc_meta_endpoint',metaEndpoint); tfCache={}; refreshAll(); }
-function resetView(){viewOffset=0;viewCount=150;$('zoomRange').value=150;draw();}
-function zoomIn(){setZoom(Math.max(60,viewCount-20));$('zoomRange').value=viewCount;}
-function zoomOut(){setZoom(Math.min(280,viewCount+20));$('zoomRange').value=viewCount;}
-function setZoom(v){viewCount=clamp(v,60,280);draw();}
-function shiftView(n){viewOffset=clamp(viewOffset+n,0,Math.max(0,candles.length-viewCount));draw();}
-
-function ema(values,p){let k=2/(p+1),out=[],prev=values[0]; for(let i=0;i<values.length;i++){prev=i===0?values[i]:values[i]*k+prev*(1-k);out.push(prev);} return out;}
-function calcATR(cs,p=14){let tr=[]; for(let i=0;i<cs.length;i++){tr.push(i===0?cs[i].h-cs[i].l:Math.max(cs[i].h-cs[i].l,Math.abs(cs[i].h-cs[i-1].c),Math.abs(cs[i].l-cs[i-1].c)));} return ema(tr,p);}
-function calcRSI(cs,p=14){let out=new Array(cs.length).fill(50),g=0,l=0; for(let i=1;i<cs.length;i++){let d=cs[i].c-cs[i-1].c;if(i<=p){if(d>=0)g+=d;else l-=d; if(i===p){g/=p;l/=p;out[i]=100-100/(1+g/(l||1e-9));}}else{g=(g*(p-1)+Math.max(d,0))/p;l=(l*(p-1)+Math.max(-d,0))/p;out[i]=100-100/(1+g/(l||1e-9));}} return out;}
-function calcVWAP(cs){let cumPV=0,cumV=0,out=[]; for(const x of cs){const tp=(x.h+x.l+x.c)/3; cumPV+=tp*x.v; cumV+=x.v; out.push(cumPV/(cumV||1));} return out;}
-function pivotPoints(cs,windows=[2,3,5]){const highs=[],lows=[]; windows.forEach(w=>{for(let i=w;i<cs.length-w;i++){let H=true,L=true; for(let j=i-w;j<=i+w;j++){if(j===i)continue; if(cs[j].h>=cs[i].h)H=false; if(cs[j].l<=cs[i].l)L=false;} if(H)highs.push({i,price:cs[i].h,from:Math.max(cs[i].o,cs[i].c),to:cs[i].h,w}); if(L)lows.push({i,price:cs[i].l,from:cs[i].l,to:Math.min(cs[i].o,cs[i].c),w});}}); return {highs,lows};}
-function clusterZones(points,tol,max=6){const clusters=[]; points.slice(-180).forEach(p=>{let c=clusters.find(x=>Math.abs(x.price-p.price)<=tol); if(!c)clusters.push({price:p.price,top:p.to,bottom:p.from,points:[p],last:p.i}); else{c.points.push(p); c.price=avg(c.points.map(q=>q.price)); c.top=Math.max(c.top,p.to); c.bottom=Math.min(c.bottom,p.from); c.last=Math.max(c.last,p.i);}}); clusters.forEach(c=>{c.touches=c.points.length;c.strength=c.touches*18+c.last/30;c.upper=Math.max(c.top,c.price+tol*.18);c.lower=Math.min(c.bottom,c.price-tol*.18);}); return clusters.sort((a,b)=>b.strength-a.strength).slice(0,max);}
-function detectFVG(cs,atr){const res=[]; for(let i=2;i<cs.length;i++){const a=cs[i-2],c=cs[i]; if(c.l>a.h){const from=a.h,to=c.l;if(to-from>atr*.14)res.push({type:'BULL',from,to,mid:(from+to)/2,i:i-2,end:i,mitigated:cs.slice(i+1).some(x=>x.l<=from)});} if(c.h<a.l){const from=c.h,to=a.l;if(to-from>atr*.14)res.push({type:'BEAR',from,to,mid:(from+to)/2,i:i-2,end:i,mitigated:cs.slice(i+1).some(x=>x.h>=to)});}} return res.filter(x=>!x.mitigated).slice(-14);}
-function detectLiquidity(sup,res,price,atr){const liq=[]; res.forEach(l=>{if(l.touches>=2)liq.push({type:'BUY LIQ',price:l.price,side:'above',dist:l.price-price,points:l.touches});}); sup.forEach(l=>{if(l.touches>=2)liq.push({type:'SELL LIQ',price:l.price,side:'below',dist:price-l.price,points:l.touches});}); return liq.filter(x=>Math.abs(x.dist)<atr*12).sort((a,b)=>Math.abs(a.dist)-Math.abs(b.dist));}
-function detectOB(cs,atrA){let obs=[]; for(let i=3;i<cs.length;i++){const imp=Math.abs(cs[i].c-cs[i-1].c); if(imp>atrA[i]*1.15){if(cs[i].c>cs[i].o){let j=i-1;while(j>1&&cs[j].c>=cs[j].o)j--;obs.push({type:'DEMAND',i:j,from:cs[j].l,to:Math.max(cs[j].o,cs[j].c),end:i});}else{let j=i-1;while(j>1&&cs[j].c<=cs[j].o)j--;obs.push({type:'SUPPLY',i:j,from:Math.min(cs[j].o,cs[j].c),to:cs[j].h,end:i});}}} return obs.slice(-10);}
-function projectedMove(last,sup,res,liq,fvg,atr,decision){const above=[],below=[]; res.forEach(z=>above.push({price:z.price,reason:`R zone ${fmt(z.lower,0)}–${fmt(z.upper,0)}`})); sup.forEach(z=>below.push({price:z.price,reason:`S zone ${fmt(z.lower,0)}–${fmt(z.upper,0)}`})); liq.forEach(l=>{(l.price>last.c?above:below).push({price:l.price,reason:`${l.type} liquidity`});}); fvg.forEach(g=>{if(g.type==='BEAR'&&g.from>last.c)above.push({price:g.mid,reason:'Bearish FVG fill'}); if(g.type==='BULL'&&g.to<last.c)below.push({price:g.mid,reason:'Bullish FVG fill'});}); above.sort((a,b)=>a.price-b.price); below.sort((a,b)=>b.price-a.price); const up=above[0]||{price:last.c+atr*1.8,reason:'ATR extension'}, dn=below[0]||{price:last.c-atr*1.8,reason:'ATR extension'}; if(decision==='BUY')return{dir:'UP',target:up.price,move:up.price-last.c,reason:up.reason}; if(decision==='SELL')return{dir:'DOWN',target:dn.price,move:last.c-dn.price,reason:dn.reason}; return (up.price-last.c)<(last.c-dn.price)?{dir:'UP',target:up.price,move:up.price-last.c,reason:up.reason}:{dir:'DOWN',target:dn.price,move:last.c-dn.price,reason:dn.reason};}
-function makeTradeSetup(a){const p=a.last.c,atr=a.atrLast,s=a.levels.sup[0],r=a.levels.res[0],m=a.projected; let dir=a.decision==='SELL'?'SELL':'BUY'; if(a.decision==='WAIT')dir=m.dir==='DOWN'?'SELL':'BUY'; if(dir==='BUY'){const entry=s?Math.max(s.price,p-atr*1.05):p; const sl=(s?s.lower:entry)-atr*.45; const tp1=m.target>entry?m.target:entry+atr*1.5; const tp2=tp1+atr*1.15; const rr=(tp1-entry)/Math.max(entry-sl,1); return {dir,entry,sl,tp1,tp2,rr};} const entry=r?Math.min(r.price,p+atr*1.05):p; const sl=(r?r.upper:entry)+atr*.45; const tp1=m.target<entry?m.target:entry-atr*1.5; const tp2=tp1-atr*1.15; const rr=(entry-tp1)/Math.max(sl-entry,1); return {dir,entry,sl,tp1,tp2,rr};}
-function analyze(cs){if(cs.length<60)return null; const closes=cs.map(x=>x.c),vols=cs.map(x=>x.v); const e20=ema(closes,20),e50=ema(closes,50),e200=ema(closes,200),atr=calcATR(cs,14),rsi=calcRSI(cs,14),vwap=calcVWAP(cs); const last=cs.at(-1), atrLast=atr.at(-1); const pv=pivotPoints(cs); const tol=Math.max(atrLast*.26,last.c*.0009); const res=clusterZones(pv.highs,tol,7).filter(x=>x.price>last.c-atrLast*2.5).sort((a,b)=>a.price-b.price); const sup=clusterZones(pv.lows,tol,7).filter(x=>x.price<last.c+atrLast*2.5).sort((a,b)=>b.price-a.price); const fvg=detectFVG(cs,atrLast), liq=detectLiquidity(sup,res,last.c,atrLast), ob=detectOB(cs,atr); const recent=cs.slice(-30); const buyVol=recent.filter(x=>x.c>=x.o).reduce((s,x)=>s+x.v,0), sellVol=recent.filter(x=>x.c<x.o).reduce((s,x)=>s+x.v,0); const buyers=buyVol/(buyVol+sellVol||1)*100; const volAvg=avg(vols.slice(-80,-10)),volNow=avg(vols.slice(-10)); let score=50; if(last.c>e20.at(-1))score+=8;else score-=8; if(last.c>e50.at(-1))score+=12;else score-=12; if(last.c>e200.at(-1))score+=10;else score-=10; if(e20.at(-1)>e50.at(-1))score+=8;else score-=8; if(last.c>vwap.at(-1))score+=8;else score-=8; if(rsi.at(-1)>56)score+=8;if(rsi.at(-1)<44)score-=8;if(buyers>56)score+=8;if(buyers<44)score-=8;if(fvg.some(x=>x.type==='BULL'&&x.to<last.c))score+=4;if(fvg.some(x=>x.type==='BEAR'&&x.from>last.c))score-=4;score=clamp(Math.round(score),0,100); let decision='WAIT',mood='محايد'; if(score>=67){decision='BUY';mood='مزاج شراء'}else if(score<=33){decision='SELL';mood='مزاج بيع'} const zone=sup[0]&&res[0]?(last.c<(sup[0].price+res[0].price)/2?'قريب من الدعم':'قريب من المقاومة'):'غير محدد'; const projected=projectedMove(last,sup,res,liq,fvg,atrLast,decision); return {cs,last,closes,e20,e50,e200,atr,rsi,vwap,levels:{sup,res},fvg,liq,ob,buyers,sellers:100-buyers,volState:volNow>volAvg*1.35?'HIGH':volNow<volAvg*.7?'LOW':'NORMAL',score,decision,mood,zone,atrLast,projected};}
-function biasFor(cs){const a=analyze(cs); if(!a)return{dir:'---',cls:'',txt:'---',score:50}; return{dir:a.score>=62?'صاعد':a.score<=38?'هابط':'عرضي',score:a.score,txt:`RSI ${fmt(a.rsi.at(-1),1)} • EMA ${a.last.c>a.e50.at(-1)?'فوق':'تحت'} 50`,cls:a.score>=62?'green':a.score<=38?'red':'yellow'};}
-function updateTopDown(){['D1','H4','H1','M15'].forEach(tf=>{const b=biasFor(tfCache[tf]||[]);const el=$('bias'+tf),sub=$('bias'+tf+'s');if(el){el.textContent=b.dir;el.className='v '+b.cls}if(sub)sub.textContent=b.txt}); const arr=['D1','H4','H1','M15'].map(tf=>biasFor(tfCache[tf]||[]).score); const m=avg(arr.filter(Number.isFinite)); $('topReason').innerHTML=m>=62?'التوافق العام يميل إلى <b class="green">الشراء</b> مع مراقبة السيولة والمقاومات.':m<=38?'التوافق العام يميل إلى <b class="red">البيع</b> وأي صعود قد يكون تصحيحًا.':'التوافق مختلط، الأفضل انتظار منطقة واضحة.';}
-function updateAll(){analysis=analyze(candles); if(!analysis)return; tradeSetup=makeTradeSetup(analysis); $('candleCount').textContent=candles.length; $('livePrice').textContent=fmt(analysis.last.c,2); const ch=analysis.last.c-candles.at(-2).c; $('priceSub').innerHTML=`${symbol} • ${currentTF} • <span class="${ch>=0?'green':'red'}">${ch>=0?'+':''}${fmt(ch,2)}</span>`; updatePanels(); updateTopDown(); calcRisk(); draw(); checkSmartAlerts();}
-function updatePanels(){const a=analysis,t=tradeSetup,score=a.score; $('decision').textContent=a.decision; $('decision').className='sigDir '+(a.decision==='BUY'?'green':a.decision==='SELL'?'red':'yellow'); $('confidence').textContent=score+'%'; $('scoreText').textContent='Score '+score+'/100'; $('scoreBar').style.width=score+'%'; $('decisionSub').textContent=a.mood+' — '+a.zone; $('decisionTags').innerHTML=[`<span class="tag">${a.last.c>a.vwap.at(-1)?'فوق VWAP':'تحت VWAP'}</span>`,`<span class="tag">RSI ${fmt(a.rsi.at(-1),1)}</span>`,`<span class="tag">ATR ${fmt(a.atrLast,1)}</span>`,`<span class="tag">Buyers ${fmt(a.buyers,0)}%</span>`,`<span class="tag">R:R ${fmt(t.rr,2)}</span>`].join('');
-  $('buyersPct').textContent=fmt(a.buyers,0)+'%';$('sellersPct').textContent=fmt(a.sellers,0)+'%';$('volState').textContent=a.volState;$('sideVWAP').textContent=fmt(a.vwap.at(-1),2);$('sideRSI').textContent=fmt(a.rsi.at(-1),1);$('sideATR').textContent=fmt(a.atrLast,1);$('sideMood').textContent=a.mood;$('sideMood').className='val '+(a.decision==='BUY'?'green':a.decision==='SELL'?'red':'yellow');
-  const ns=a.levels.sup[0]?Math.max(0,a.last.c-a.levels.sup[0].price):NaN,nr=a.levels.res[0]?Math.max(0,a.levels.res[0].price-a.last.c):NaN; $('nearSupport').textContent=Number.isFinite(ns)?'$'+fmt(ns,1):'---';$('nearResistance').textContent=Number.isFinite(nr)?'$'+fmt(nr,1):'---';$('fvgCount').textContent=a.fvg.length;$('liqNear').textContent=a.liq[0]?`${a.liq[0].type} ${fmt(a.liq[0].price,0)}`:'لا يوجد';$('quickFilter').innerHTML=quickText(a);
-  $('bullFVG').textContent=a.fvg.filter(x=>x.type==='BULL').length;$('bearFVG').textContent=a.fvg.filter(x=>x.type==='BEAR').length;$('eqHighs').textContent=a.liq.filter(x=>x.type==='BUY LIQ').length;$('eqLows').textContent=a.liq.filter(x=>x.type==='SELL LIQ').length;$('zoneBadge').textContent=a.zone;$('targetBadge').textContent=fmt(a.projected.target,0);
-  $('moveDir').textContent=t.dir==='BUY'?'صعود / شراء':'هبوط / بيع';$('moveDir').className='val '+(t.dir==='BUY'?'green':'red');$('setupEntry').textContent=fmt(t.entry,0);$('setupSL').textContent=fmt(t.sl,0);$('setupTP').textContent=`${fmt(t.tp1,0)} / ${fmt(t.tp2,0)}`;$('setupRR').textContent=fmt(t.rr,2);$('moveReason').textContent=a.projected.reason; updateLevels(); updateFVGTable(); updateTradePlan(); updatePriorityPanel();}
-function quickText(a){const r=a.levels.res[0],s=a.levels.sup[0],liq=a.liq[0],out=[]; if(s&&a.last.c-s.price<a.atrLast*1.3)out.push('السعر قريب من دعم قوي: انتظر رفض صاعد لتأكيد الشراء.'); if(r&&r.price-a.last.c<a.atrLast*1.3)out.push('السعر قريب من مقاومة: لا تطارد الشراء قبل اختراق وثبات.'); if(a.fvg.length)out.push(`يوجد ${a.fvg.length} FVG فعّالة قد تعمل كمغناطيس أو منطقة دخول.`); if(liq)out.push(`أقرب سيولة ${liq.type} عند ${fmt(liq.price,0)}.`); return out.join(' ')||'أفضل الدخول من دعم/FVG للشراء أو مقاومة/FVG للبيع.';}
-function updateLevels(){const a=analysis;let html='';const add=(z,k,cls,desc)=>`<div class="level"><div class="k">${k}</div><div class="p ${cls}">${fmt(z.price,0)}</div><div class="d">${desc}<br>${fmt(z.lower,0)}–${fmt(z.upper,0)} • ${z.touches} touches</div></div>`; a.levels.res.slice(0,3).forEach((z,i)=>html+=add(z,'R'+(i+1),'red','مقاومة')); a.levels.sup.slice(0,3).forEach((z,i)=>html+=add(z,'S'+(i+1),'green','دعم')); $('levelsList').innerHTML=html||'<div class="reason">لا توجد مستويات كافية.</div>';}
-function updateFVGTable(){const rows=analysis.fvg.slice(-6).reverse().map(x=>`<tr><td class="${x.type==='BULL'?'cyan':'orange'}">${x.type}</td><td>${fmt(x.from,0)}</td><td>${fmt(x.to,0)}</td><td>${x.mitigated?'ممسوحة':'فعالة'}</td></tr>`).join(''); $('fvgTable').innerHTML=rows||'<tr><td colspan="4" class="small">لا توجد FVG فعالة قريبة.</td></tr>';}
-function updateTradePlan(){const a=analysis,t=tradeSetup; let html=`<div class="plan"><b class="${t.dir==='BUY'?'green':'red'}">${t.dir==='BUY'?'سيناريو شراء':'سيناريو بيع'}:</b> Entry ${fmt(t.entry,0)} • SL ${fmt(t.sl,0)} • TP1 ${fmt(t.tp1,0)} • TP2 ${fmt(t.tp2,0)} • R:R ${fmt(t.rr,2)}.</div>`; if(a.liq[0])html+=`<div class="plan">أقرب سيولة: <b class="yellow">${a.liq[0].type}</b> عند ${fmt(a.liq[0].price,0)}. قد يسحبها السعر قبل الانعكاس أو الاستمرار.</div>`; html+=`<div class="plan">سبب الهدف: <b>${a.projected.reason}</b>. الحركة المتوقعة تقريبًا <b class="violet">$${fmt(a.projected.move,1)}</b>.</div>`; $('tradePlan').innerHTML=html;}
-function calcRisk(){const acc=+$('acc').value||0,risk=+$('risk').value||0,sl=+$('slDist').value||1,lotVal=+$('lotValue').value||1;const money=acc*risk/100,lot=money/(sl*lotVal);$('riskOut').innerHTML=`المخاطرة المسموحة: <b class="yellow">$${fmt(money,2)}</b><br>حجم تقريبي: <b class="cyan">${fmt(lot,4)} lot</b> إذا كان كل 1$ حركة = ${lotVal}$ لكل 1 lot.`;}
-
-function zonePriority(kind, low, high, touches=0){
-  const p=analysis?.last?.c ?? ((low+high)/2), atr=Math.max(1, analysis?.atrLast||1);
-  const mid=(low+high)/2, dist=Math.abs(mid-p)/atr;
-  let base = dist<.55?96:dist<1?84:dist<1.8?68:dist<3?50:34;
-  base += Math.min(12, (touches||0)*3);
-  if(kind.includes('Liquidity')) base += 4;
-  return clamp(Math.round(base),18,100);
+function changeSymbol(){
+  symbol=($('symbolInput')?.value||symbol).trim().toUpperCase()||'BTCUSD';
+  metaEndpoint=($('endpointInput')?.value||metaEndpoint).trim()||'/api/metaapi-candles';
+  localStorage.setItem('btc_meta_symbol',symbol);
+  localStorage.setItem('btc_meta_endpoint',metaEndpoint);
+  tfCache={};refreshAll();
 }
-function prioClass(score){return score>=78?'scoreHigh':score>=55?'scoreMid':'scoreLow';}
-function prioAlpha(score){return overlays.priority?(.20 + .80*(score/100)):.70;}
-function prioWidth(score){return overlays.priority?(1 + (score/100)*1.7):1.2;}
-function scoreLabel(score){return score>=78?'HIGH':score>=55?'MID':'LOW';}
-function collectPriorityZones(){
-  if(!analysis) return [];
-  const out=[];
-  analysis.levels.sup.slice(0,5).forEach((z,i)=>out.push({kind:'Support',name:`S${i+1}`,low:z.lower,high:z.upper,price:z.price,touches:z.touches,score:zonePriority('Support',z.lower,z.upper,z.touches)}));
-  analysis.levels.res.slice(0,5).forEach((z,i)=>out.push({kind:'Resistance',name:`R${i+1}`,low:z.lower,high:z.upper,price:z.price,touches:z.touches,score:zonePriority('Resistance',z.lower,z.upper,z.touches)}));
-  analysis.fvg.slice(-10).forEach(g=>out.push({kind:g.type==='BULL'?'Bull FVG':'Bear FVG',name:g.type==='BULL'?'BFVG':'BearFVG',low:g.from,high:g.to,price:g.mid,touches:0,score:zonePriority(g.type+' FVG',g.from,g.to,0)}));
-  analysis.ob.slice(-8).forEach(o=>out.push({kind:o.type==='DEMAND'?'Demand OB':'Supply OB',name:o.type==='DEMAND'?'D-OB':'S-OB',low:o.from,high:o.to,price:(o.from+o.to)/2,touches:0,score:zonePriority(o.type+' OB',o.from,o.to,0)}));
-  analysis.liq.slice(0,6).forEach(l=>out.push({kind:'Liquidity',name:l.type.replace(' LIQ',''),low:l.price,high:l.price,price:l.price,touches:l.points||0,score:zonePriority('Liquidity',l.price,l.price,l.points||0)}));
-  return out.sort((a,b)=>b.score-a.score).slice(0,10);
+function biasFor(tf){
+  const cs=tfCache[tf]||[];
+  const a=analyze(cs);
+  if(!a)return{dir:'---',cls:'',txt:'---',score:50};
+  const dir=a.score>=62?'صاعد':a.score<=38?'هابط':'عرضي';
+  const cls=a.score>=62?'green':a.score<=38?'red':'orange';
+  const txt=`RSI ${fmt(a.rsi.at(-1),1)} • ${a.last.c>a.e50.at(-1)?'فوق':'تحت'} EMA50`;
+  return{dir,cls,txt,score:a.score};
 }
-function updatePriorityPanel(){
-  const el=$('priorityList'); if(!el||!analysis) return;
-  const rows=collectPriorityZones().slice(0,6);
-  el.innerHTML=rows.map(z=>`<div class="prioItem"><div class="prioName">${z.kind}</div><div class="prioTxt">${fmt(z.low,0)}-${fmt(z.high,0)}</div><div class="prioScore ${prioClass(z.score)}">${z.score}</div></div>`).join('') || '<div class="reason">لا توجد مناطق كافية.</div>';
-}
-function centeredTag(ctx,text,x1,y1,x2,y2,clr,score=70){
-  if(overlays.priority && score<50) return;
-  const midX=(x1+x2)/2, midY=(y1+y2)/2;
-  ctx.save(); ctx.globalAlpha=score>=78?.95:.74; ctx.font='9px JetBrains Mono';
-  const w=ctx.measureText(text).width+10,h=17;
-  ctx.fillStyle='rgba(255,255,255,.82)'; ctx.strokeStyle='rgba(148,163,184,.45)';
-  roundRect(ctx,midX-w/2,midY-h/2,w,h,6,true,true);
-  ctx.fillStyle=clr; ctx.fillText(text,midX-w/2+5,midY+4); ctx.restore();
-}
-function createSideLabelManager(ctx,w,h,pad,plotW){
-  return {left:[],right:[],draw(side,text,anchorY,clr){
-    const arr=this[side],boxH=19,minY=pad.t+4,maxY=h-pad.b-boxH-4;
-    let yy=clamp(anchorY-boxH/2,minY,maxY),shifted=false;
-    for(let attempt=0;attempt<24;attempt++){
-      const hit=arr.find(v=>Math.abs(v-yy)<boxH+3);
-      if(!hit) break;
-      shifted=true;
-      yy=clamp(anchorY-boxH/2+((attempt%2===0?1:-1)*(12+Math.floor(attempt/2)*9)),minY,maxY);
-    }
-    arr.push(yy);
-    ctx.save(); ctx.font='9px JetBrains Mono';
-    const boxW=ctx.measureText(text).width+10;
-    const x=side==='right'?w-pad.r+8:8;
-    ctx.fillStyle='rgba(255,255,255,.93)'; ctx.strokeStyle='rgba(185,198,212,.72)';
-    roundRect(ctx,x,yy,boxW,boxH,6,true,true);
-    ctx.fillStyle=clr; ctx.fillText(text,x+5,yy+12);
-    if(shifted){
-      const anchorX=side==='right'?pad.l+plotW:pad.l;
-      const edgeX=side==='right'?x:x+boxW;
-      ctx.strokeStyle='rgba(100,116,139,.70)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
-      ctx.beginPath(); ctx.moveTo(anchorX,anchorY); ctx.lineTo(edgeX,yy+boxH/2); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle='rgba(100,116,139,.92)'; ctx.fillText(side==='right'?'↗':'↖',side==='right'?x+boxW-11:x+4,yy+12);
-    }
-    ctx.restore();
-  }};
-}
-function openGuide(){$('guideModal').classList.add('open');}
-function closeGuide(){$('guideModal').classList.remove('open');}
-
-
-function setupCanvas(cv,mul=1){const rect=cv.parentElement.getBoundingClientRect();const ratio=(window.devicePixelRatio||1)*mul;cv.width=Math.floor(rect.width*ratio);cv.height=Math.floor(rect.height*ratio);cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';return{ratio,w:rect.width,h:rect.height};}
-function getView(){const end=candles.length-viewOffset,start=Math.max(0,end-viewCount);return{start,end,cs:candles.slice(start,end)};}
-function draw(){renderChart($('chart'),1,false);}
-function renderChart(cv,mul=1,exporting=false){if(!analysis)return; const meta=setupCanvas(cv,mul),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.save();ctx.scale(meta.ratio,meta.ratio);const w=meta.w,h=meta.h,pad={l:72,r:118,t:42,b:36},plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,{start,end,cs}=getView();if(!cs.length){ctx.restore();return;} let min=Math.min(...cs.map(x=>x.l)),max=Math.max(...cs.map(x=>x.h)); [tradeSetup?.entry,tradeSetup?.sl,tradeSetup?.tp1,tradeSetup?.tp2,analysis.projected?.target,...analysis.levels.res.slice(0,4).map(z=>z.upper),...analysis.levels.sup.slice(0,4).map(z=>z.lower),...analysis.liq.slice(0,4).map(z=>z.price)].filter(Number.isFinite).forEach(v=>{min=Math.min(min,v);max=Math.max(max,v);}); const extra=(max-min)*.10||1;min-=extra;max+=extra; const y=v=>pad.t+(max-v)/(max-min)*plotH,x=i=>pad.l+(i-start+.5)*plotW/(end-start),barW=Math.max(2,plotW/(end-start)*.62); chartGeom={pad,plotW,plotH,start,end,min,max,w,h}; chartSideMgr=createSideLabelManager(ctx,w,h,pad,plotW);
-  drawGrid(ctx,w,h,pad,min,max,y); drawSessions(ctx,cs,start,x,pad,plotH);
-  if(overlays.sup||overlays.res)drawZones(ctx,{sup:overlays.sup?analysis.levels.sup:[],res:overlays.res?analysis.levels.res:[]},y,pad,plotW);
-  if(overlays.bullfvg||overlays.bearfvg)drawFVG(ctx,[...(overlays.bullfvg?analysis.fvg.filter(z=>z.type==='BULL'):[]),...(overlays.bearfvg?analysis.fvg.filter(z=>z.type==='BEAR'):[])],start,end,x,y,pad,plotW);
-  if(overlays.demandob||overlays.supplyob)drawOB(ctx,[...(overlays.demandob?analysis.ob.filter(z=>z.type==='DEMAND'):[]),...(overlays.supplyob?analysis.ob.filter(z=>z.type==='SUPPLY'):[])],start,end,x,y,pad,plotW);
-  if(overlays.liq)drawLiquidity(ctx,analysis.liq,y,pad,plotW);
-  if(overlays.vwap)drawSeries(ctx,analysis.vwap,start,end,x,y,css('--violet'),1.8,[5,4]);
-  if(overlays.ema){drawSeries(ctx,analysis.e20,start,end,x,y,css('--yellow'),1.8,[]);drawSeries(ctx,analysis.e50,start,end,x,y,css('--blue'),1.8,[]);drawSeries(ctx,analysis.e200,start,end,x,y,'#64748b',1.3,[4,5]);}
-  drawCandles(ctx,cs,start,x,y,barW); drawPriceLine(ctx,analysis.last.c,y,pad,plotW);
-  if(overlays.trade)drawTradeLines(ctx,tradeSetup,y,pad,plotW);
-  drawAxis(ctx,w,h,pad,cs,start,x); ctx.restore(); if(exporting)return cv.toDataURL('image/png');}
-function drawGrid(ctx,w,h,pad,min,max,y){ctx.strokeStyle='rgba(148,163,184,.18)';ctx.lineWidth=1;ctx.font='10px JetBrains Mono';ctx.fillStyle='rgba(96,115,137,.95)';for(let i=0;i<=8;i++){const yy=pad.t+i*(h-pad.t-pad.b)/8;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillText(fmt(max-(max-min)*i/8,0),w-pad.r+7,yy+3);}for(let i=0;i<=10;i++){const xx=pad.l+i*(w-pad.l-pad.r)/10;ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,h-pad.b);ctx.stroke();}}
-function drawCandles(ctx,cs,start,x,y,barW){cs.forEach((c,idx)=>{const xx=x(start+idx),up=c.c>=c.o,clr=up?css('--green'):css('--red');ctx.strokeStyle=clr;ctx.fillStyle=clr;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(xx,y(c.h));ctx.lineTo(xx,y(c.l));ctx.stroke();const yo=y(c.o),yc=y(c.c);ctx.fillRect(xx-barW/2,Math.min(yo,yc),barW,Math.max(1,Math.abs(yc-yo)));});}
-function drawSeries(ctx,arr,start,end,x,y,clr,lw,dash){ctx.save();ctx.strokeStyle=clr;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();let first=true;for(let i=start;i<end;i++){if(!Number.isFinite(arr[i]))continue;if(first){ctx.moveTo(x(i),y(arr[i]));first=false;}else ctx.lineTo(x(i),y(arr[i]));}ctx.stroke();ctx.restore();}
-function drawZones(ctx,levels,y,pad,plotW){
-  const zones=[...levels.res.slice(0,4).map((z,i)=>({...z,kind:'Resistance Block',idx:i+1})),...levels.sup.slice(0,4).map((z,i)=>({...z,kind:'Support Block',idx:i+1}))];
-  zones.forEach(z=>{
-    const y1=y(z.upper),y2=y(z.lower),top=Math.min(y1,y2),hh=Math.max(5,Math.abs(y2-y1)),isR=z.kind.startsWith('Resistance');
-    const score=zonePriority(z.kind,z.lower,z.upper,z.touches||0);
-    ctx.save(); ctx.globalAlpha=prioAlpha(score); ctx.lineWidth=prioWidth(score);
-    ctx.fillStyle=isR?css('--sellZone'):css('--buyZone'); ctx.strokeStyle=isR?'rgba(220,38,38,.44)':'rgba(22,163,74,.44)';
-    ctx.setLineDash([7,5]); roundRect(ctx,pad.l,top,plotW,hh,7,true,true); ctx.setLineDash([]);
-    if(score>=78){ctx.strokeStyle=isR?'rgba(220,38,38,.90)':'rgba(22,163,74,.90)';ctx.lineWidth=2.4;ctx.strokeRect(pad.l+1,top+1,plotW-2,Math.max(3,hh-2));}
-    ctx.restore();
-    centeredTag(ctx,`${isR?'Resistance':'Support'} (${fmt(z.lower,0)}-${fmt(z.upper,0)})`,pad.l,top,pad.l+plotW,top+hh,isR?css('--red'):css('--green'),score);
-    if(score>=55&&chartSideMgr) chartSideMgr.draw('right',`${isR?'R':'S'}${z.idx} ${fmt(z.price,0)} ${scoreLabel(score)}`,y(z.price),isR?css('--red'):css('--green'));
+function updateMTF(){
+  const frames=['D1','H4','H1','M15'];
+  const scores=[];
+  frames.forEach(tf=>{
+    const b=biasFor(tf);scores.push(b.score);
+    const e=$('bias'+tf),s=$('bias'+tf+'s');
+    if(e){e.textContent=b.dir;e.className='tfBias '+b.cls;}
+    if(s)s.textContent=b.txt;
   });
+  const m=avg(scores.filter(Number.isFinite));
+  const txt=m>=62?'شراء عام':m<=38?'بيع عام':'مختلط';
+  if($('topSummary'))$('topSummary').textContent=txt;
 }
-function drawFVG(ctx,fvgs,start,end,x,y,pad,plotW){
-  fvgs.slice(-10).forEach(g=>{
-    if(g.end<start||g.i>end)return;
-    const x1=Math.max(pad.l,x(g.i)),x2=Math.min(pad.l+plotW,x(Math.min(end-1,g.end+28))),y1=y(g.to),y2=y(g.from),top=Math.min(y1,y2),hh=Math.max(4,Math.abs(y2-y1));
-    const score=zonePriority(g.type==='BULL'?'Bull FVG':'Bear FVG',g.from,g.to,0);
-    ctx.save(); ctx.globalAlpha=prioAlpha(score); ctx.lineWidth=prioWidth(score);
-    ctx.fillStyle=g.type==='BULL'?css('--fvgBull'):css('--fvgBear'); ctx.strokeStyle=g.type==='BULL'?'rgba(0,184,230,.52)':'rgba(249,115,22,.52)';
-    roundRect(ctx,x1,top,Math.max(10,x2-x1),hh,6,true,true);
-    ctx.restore();
-    centeredTag(ctx,`${g.type==='BULL'?'Bull FVG':'Bear FVG'} (${fmt(g.from,0)}-${fmt(g.to,0)})`,x1,top,x2,top+hh,g.type==='BULL'?css('--cyan'):css('--orange'),score);
-  });
+function scoreCss(s){return s>=78?'high':s>=55?'mid':'low'}
+function updateFullZones(zones){
+  const el=$('allZonesList'); if(!el)return;
+  el.innerHTML=zones.slice(0,10).map(z=>`<div class="zoneRow"><div class="zKind">${z.kind}</div><div class="zPrice">${z.code} ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}</div><div class="zScore ${scoreCss(z.score)}">${z.score}</div></div>`).join('') || '<div class="guideMini">لا توجد مناطق كافية.</div>';
 }
-function drawLiquidity(ctx,liq,y,pad,plotW){
-  liq.slice(0,8).forEach(l=>{
-    const yy=y(l.price),score=zonePriority('Liquidity',l.price,l.price,l.points||0);
-    ctx.save(); ctx.globalAlpha=prioAlpha(score); ctx.lineWidth=prioWidth(score);
-    ctx.strokeStyle=css('--liq'); ctx.setLineDash([2,5]); ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(pad.l+plotW,yy); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
-    if(score>=55&&chartSideMgr) chartSideMgr.draw('right',`${l.type} ${fmt(l.price,0)} ${scoreLabel(score)}`,yy,css('--yellow'));
-  });
+function updateQuickFilter(a){
+  const s=a.levels.sup[0],r=a.levels.res[0],liq=a.liq[0];
+  if($('nearSupport'))$('nearSupport').textContent=s?'$'+fmt(Math.max(0,a.last.c-s.price),1):'---';
+  if($('nearResistance'))$('nearResistance').textContent=r?'$'+fmt(Math.max(0,r.price-a.last.c),1):'---';
+  if($('fvgCount'))$('fvgCount').textContent=a.fvg.length;
+  if($('liqNear'))$('liqNear').textContent=liq?`${liq.type} ${fmt(liq.price,0)}`:'لا يوجد';
 }
-function drawOB(ctx,obs,start,end,x,y,pad,plotW){
-  obs.slice(-8).forEach(o=>{
-    if(o.i<start-30||o.i>end)return;
-    const x1=Math.max(pad.l,x(o.i)-6),x2=Math.min(pad.l+plotW,x(Math.min(end-1,o.i+22))),y1=y(o.to),y2=y(o.from),top=Math.min(y1,y2),hh=Math.max(4,Math.abs(y2-y1));
-    const score=zonePriority(o.type==='DEMAND'?'Demand OB':'Supply OB',o.from,o.to,0);
-    ctx.save(); ctx.globalAlpha=prioAlpha(score); ctx.lineWidth=prioWidth(score);
-    ctx.fillStyle=o.type==='DEMAND'?'rgba(34,197,94,.10)':'rgba(239,68,68,.10)'; ctx.strokeStyle=o.type==='DEMAND'?'rgba(34,197,94,.42)':'rgba(239,68,68,.42)';
-    roundRect(ctx,x1,top,Math.max(10,x2-x1),hh,5,true,true);
-    ctx.restore();
-    centeredTag(ctx,`${o.type==='DEMAND'?'Demand OB':'Supply OB'} (${fmt(o.from,0)}-${fmt(o.to,0)})`,x1,top,x2,top+hh,o.type==='DEMAND'?css('--green'):css('--red'),score);
-  });
+function tradeNarrative(a,t){
+  const z=collectZones()[0];
+  const main=z?`${z.kind} عند ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''} بدرجة ${z.score}`:'لا توجد منطقة أولوية واضحة';
+  return `القرار الحالي: <b>${a.decision}</b> بثقة <b>${a.score}%</b>. أقوى منطقة حالية: <b>${main}</b>. الخطة: Entry ${fmt(t.entry,0)}، SL ${fmt(t.sl,0)}، TP1 ${fmt(t.tp1,0)}، TP2 ${fmt(t.tp2,0)}، ونسبة R:R ${fmt(t.rr,2)}.`;
 }
-function drawPriceLine(ctx,price,y,pad,plotW){const yy=y(price);ctx.save();ctx.strokeStyle='rgba(0,184,230,.85)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.setLineDash([]);ctx.restore(); chartSideMgr&&chartSideMgr.draw('right',`Price ${fmt(price,2)}`,yy,css('--cyan'));}
-function drawTradeLines(ctx,t,y,pad,plotW){if(!t)return; const arr=[['Entry',t.entry,css('--green')],['SL',t.sl,css('--red')],['TP1',t.tp1,css('--cyan')],['TP2',t.tp2,css('--violet')]]; arr.forEach(([name,price,clr])=>{const yy=y(price);ctx.save();ctx.strokeStyle=clr;ctx.lineWidth=1.6;ctx.setLineDash(name==='SL'?[8,5]:[6,4]);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.setLineDash([]);ctx.restore(); chartSideMgr&&chartSideMgr.draw('left',`${name} ${fmt(price,0)}`,yy,clr);});}
-function drawAxis(ctx,w,h,pad,cs,start,x){ctx.fillStyle='rgba(96,115,137,.95)';ctx.font='10px JetBrains Mono';const step=Math.max(1,Math.floor(cs.length/5));for(let j=0;j<cs.length;j+=step){const i=start+j,d=new Date(candles[i].t),txt=currentTF==='D1'?d.toLocaleDateString('en-GB',{month:'short',day:'2-digit'}):d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});ctx.fillText(txt,x(i)-20,h-12);}}
-function drawSessions(ctx,cs,start,x,pad,plotH){ctx.save();cs.forEach((c,idx)=>{const hr=new Date(c.t).getUTCHours();if(hr>=13&&hr<=16&&idx%4===0){ctx.fillStyle='rgba(37,99,235,.03)';ctx.fillRect(x(start+idx)-3,pad.t,6,plotH);}if(hr>=7&&hr<=9&&idx%4===0){ctx.fillStyle='rgba(245,158,11,.025)';ctx.fillRect(x(start+idx)-2,pad.t,4,plotH);}});ctx.restore();}
-function label(ctx,text,x,y,clr){ctx.save();ctx.font='10px JetBrains Mono';const w=ctx.measureText(text).width+10;ctx.fillStyle='rgba(255,255,255,.94)';ctx.strokeStyle='rgba(185,198,212,.85)';roundRect(ctx,x,y,w,18,5,true,true);ctx.fillStyle=clr;ctx.fillText(text,x+5,y+12);ctx.restore();}
-function roundRect(ctx,x,y,w,h,r,fill,stroke){if(w<0){x+=w;w=-w}if(h<0){y+=h;h=-h}r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();}
-
-function saveChartImage(){const temp=document.createElement('canvas');temp.style.width=$('chartArea').clientWidth+'px';temp.style.height=$('chartArea').clientHeight+'px';$('chartArea').appendChild(temp);try{const url=renderChart(temp,3,true);const a=document.createElement('a');a.href=url;a.download=`${symbol}_${currentTF}_HD_chart.png`;a.click();}finally{temp.remove();draw();}}
-async function enterFullscreenChart(){const panel=$('centerPanel');panel.classList.add('fullscreenChart');$('exitFsBtn').style.display='inline-flex';try{if(panel.requestFullscreen)await panel.requestFullscreen();}catch(e){} try{if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape');}catch(e){} setTimeout(draw,180);}
-async function exitFullscreenChart(){const panel=$('centerPanel');panel.classList.remove('fullscreenChart');$('exitFsBtn').style.display='none';try{if(document.fullscreenElement&&document.exitFullscreen)await document.exitFullscreen();}catch(e){} try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){} setTimeout(draw,180);}
-function toggleFullscreenChart(){if($('centerPanel').classList.contains('fullscreenChart')||document.fullscreenElement)return exitFullscreenChart();return enterFullscreenChart();}
-function toggleBoxZoom(){boxZoomMode=!boxZoomMode;$('boxZoomBtn').classList.toggle('active',boxZoomMode);$('boxZoomBtn').textContent=boxZoomMode?'Box Zoom ON':'Box Zoom';$('chart').style.cursor=boxZoomMode?'zoom-in':'crosshair'; if(!boxZoomMode)hideSelectionBox();}
-function hideSelectionBox(){$('selectionBox').style.display='none';selectState=null;}
-function setupBoxZoom(){const area=$('chartArea');const pos=e=>{const p=e.touches?e.touches[0]:e;const r=area.getBoundingClientRect();return{x:p.clientX-r.left,y:p.clientY-r.top};}; area.addEventListener('pointerdown',e=>{if(!boxZoomMode||!chartGeom)return;const p=pos(e);selectState={x1:p.x,y1:p.y,x2:p.x,y2:p.y};const box=$('selectionBox');box.style.display='block';box.style.left=p.x+'px';box.style.top=p.y+'px';box.style.width='0px';box.style.height='0px';}); area.addEventListener('pointermove',e=>{if(!boxZoomMode||!selectState)return;const p=pos(e);selectState.x2=p.x;selectState.y2=p.y;const l=Math.min(selectState.x1,selectState.x2),t=Math.min(selectState.y1,selectState.y2),w=Math.abs(selectState.x2-selectState.x1),h=Math.abs(selectState.y2-selectState.y1),box=$('selectionBox');box.style.left=l+'px';box.style.top=t+'px';box.style.width=w+'px';box.style.height=h+'px';}); const finishSel=()=>{if(!boxZoomMode||!selectState||!chartGeom)return hideSelectionBox();const {pad,plotW,start,end}=chartGeom;const left=Math.max(pad.l,Math.min(selectState.x1,selectState.x2)),right=Math.min(pad.l+plotW,Math.max(selectState.x1,selectState.x2));if(right-left<28){hideSelectionBox();return;}const span=end-start;const idx1=Math.floor(start+((left-pad.l)/plotW)*span),idx2=Math.floor(start+((right-pad.l)/plotW)*span);viewCount=clamp(idx2-idx1+8,40,280);viewOffset=Math.max(0,candles.length-(idx2+2));$('zoomRange').value=viewCount;hideSelectionBox();draw();}; area.addEventListener('pointerup',finishSel); area.addEventListener('pointercancel',hideSelectionBox);}
-function enableAlerts(){alertEnabled=true;localStorage.setItem('btc_alerts','1'); if('Notification' in window && Notification.permission==='default')Notification.requestPermission(); speakArabic('تم تفعيل تنبيهات البيتكوين الصوتية بالعربية'); notify('تم تفعيل التنبيهات','ستصلك تنبيهات عند اقتراب السعر من مناطق مهمة.');}
-function testArabicVoice(){speakArabic('تنبيه بيتكوين. توجد فرصة محتملة. راقب الدعم والمقاومة والسيولة قبل الدخول.');notify('اختبار التنبيه','الصوت العربي يعمل إذا كان المتصفح يسمح بذلك.');}
-function speakArabic(text){try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.92;u.pitch=1;u.volume=1;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){console.warn(e);}}
-function notify(title,body){try{if('Notification' in window && Notification.permission==='granted')new Notification(title,{body,icon:'/icon-192.png'});}catch(e){}}
-async function registerSW(){if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('/sw.js');}catch(e){console.warn(e);}} alertEnabled=localStorage.getItem('btc_alerts')==='1';}
-function checkSmartAlerts(){if(!analysis||!alertEnabled)return; const now=Date.now(); if(now-lastAlertTime<4*60*1000)return; const a=analysis,t=tradeSetup; let msg='',key=''; if(a.decision==='BUY'&&a.score>=74){msg=`تنبيه شراء على بيتكوين. الثقة ${a.score} بالمئة. الهدف ${fmt(t.tp1,0)} والوقف ${fmt(t.sl,0)}.`;key='BUY'+Math.round(t.tp1);} else if(a.decision==='SELL'&&a.score<=26){msg=`تنبيه بيع على بيتكوين. الثقة ${100-a.score} بالمئة. الهدف ${fmt(t.tp1,0)} والوقف ${fmt(t.sl,0)}.`;key='SELL'+Math.round(t.tp1);} else {const nearS=a.levels.sup[0]&&Math.abs(a.last.c-a.levels.sup[0].price)<a.atrLast*.75; const nearR=a.levels.res[0]&&Math.abs(a.levels.res[0].price-a.last.c)<a.atrLast*.75; if(nearS){msg=`تنبيه. بيتكوين قريب من دعم قوي عند ${fmt(a.levels.sup[0].price,0)}. انتظر تأكيد الشراء.`;key='SUP'+Math.round(a.levels.sup[0].price);} if(nearR){msg=`تنبيه. بيتكوين قريب من مقاومة قوية عند ${fmt(a.levels.res[0].price,0)}. انتبه من الرفض أو جني الأرباح.`;key='RES'+Math.round(a.levels.res[0].price);} } if(msg&&key!==lastAlertKey){lastAlertKey=key;lastAlertTime=now;speakArabic(msg);notify('BTC Alert',msg);} }
-
-const chartArea=$('chartArea');chartArea.addEventListener('mousemove',e=>{if(selectState)return;const rect=chartArea.getBoundingClientRect();showCross(e.clientX-rect.left,e.clientY-rect.top);});chartArea.addEventListener('mouseleave',()=>{$('crossV').style.display=$('crossH').style.display=$('tip').style.display='none';});chartArea.addEventListener('wheel',e=>{e.preventDefault();e.deltaY<0?zoomIn():zoomOut();},{passive:false});document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){$('centerPanel').classList.remove('fullscreenChart');$('exitFsBtn').style.display='none';}else{$('exitFsBtn').style.display='inline-flex';}setTimeout(draw,120);});
-function showCross(x,ypos){if(!analysis)return;$('crossV').style.display=$('crossH').style.display='block';$('crossV').style.left=x+'px';$('crossH').style.top=ypos+'px';const {start,end}=getView(),rect=chartArea.getBoundingClientRect(),pad={l:58,r:86,t:42,b:36},plotW=rect.width-pad.l-pad.r,idx=clamp(Math.floor((x-pad.l)/plotW*(end-start))+start,0,candles.length-1),c=candles[idx];if(c){const tip=$('tip');tip.style.display='block';tip.style.left=clamp(x+12,8,rect.width-225)+'px';tip.style.top=clamp(ypos+12,8,rect.height-130)+'px';tip.innerHTML=`<b>${new Date(c.t).toLocaleString('en-GB')}</b><br>O ${fmt(c.o,2)} H ${fmt(c.h,2)}<br>L ${fmt(c.l,2)} C ${fmt(c.c,2)}<br>VOL ${fmt(c.v,2)}`;}}
-window.addEventListener('resize',draw);
-function start(){setupBoxZoom();refreshAll();setInterval(()=>loadTF(currentTF,true),15000);} start();
+function updatePanels(){if(!analysis)return;const a=analysis,t=tradeSetup,zones=collectZones();$('livePrice').textContent=fmt(a.last.c,2)+' ▲';$('symHead').textContent=symbol;$('tfHead').textContent=currentTF;$('tfBadge').textContent=currentTF;$('candleCount').textContent=candles.length;$('priceSub').textContent=`${symbol} • ${currentTF}`;$('decision').textContent=a.decision;$('confidence').textContent=a.score+'%';$('setupEntry').textContent=fmt(t.entry,0);$('setupSL').textContent=fmt(t.sl,0);$('setupTP1').textContent=fmt(t.tp1,0);if($('setupTP2'))$('setupTP2').textContent=fmt(t.tp2,0);$('setupRR').textContent=fmt(t.rr,2);if($('targetReason'))$('targetReason').textContent=a.projected.reason||'---';
+  if($('buyersPct'))$('buyersPct').textContent=fmt(a.buyers,0)+'%'; if($('sellersPct'))$('sellersPct').textContent=fmt(a.sellers,0)+'%'; if($('sideVWAP'))$('sideVWAP').textContent=fmt(a.vwap.at(-1),1); if($('sideRSI'))$('sideRSI').textContent=fmt(a.rsi.at(-1),1); if($('sideATR'))$('sideATR').textContent=fmt(a.atrLast,1); if($('sideMood')){$('sideMood').textContent=a.mood;$('sideMood').className=a.decision==='BUY'?'green':a.decision==='SELL'?'red':'orange';}
+  $('priorityCards').innerHTML=zones.slice(0,5).map((z,i)=>`<div class="prioCard ${z.class}"><div class="num">${i+1}</div><div class="prioMain"><b>${z.kind}</b><div class="price">${z.code} ${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}</div><p>${z.action}</p></div><div class="score">${z.score}</div></div>`).join('');
+  updateFullZones(zones); updateQuickFilter(a); updateMTF(); if($('tradeNarrative'))$('tradeNarrative').innerHTML=tradeNarrative(a,t);
+}
+function updateAll(){analysis=analyze(candles);if(!analysis)return;tradeSetup=makeTradeSetup(analysis);updatePanels();draw();checkSmartAlerts();}
+function resetView(){viewOffset=0;viewCount=150;draw()}
+function zoomIn(){viewCount=clamp(viewCount-20,40,280);draw()}
+function zoomOut(){viewCount=clamp(viewCount+20,40,280);draw()}
+function setZoom(v){viewCount=clamp(v,40,280);draw()}
+function shiftView(n){viewOffset=clamp(viewOffset+n,0,Math.max(0,candles.length-viewCount));draw()}
+function toggleAutoFocus(){autoFocus=!autoFocus;$('autoBtn').classList.toggle('active',autoFocus);if($('autoText'))$('autoText').textContent=autoFocus?'Auto Focus ON: يتم إبراز المناطق القريبة':'يتم تحديث المناطق تلقائيًا';if($('zoneMode'))$('zoneMode').textContent=autoFocus?'Auto Focus':'Score';draw()}
+function prioAlpha(score){return autoFocus?(.10+.90*(score/100)):(.32+.58*(score/100))}
+function prioStroke(score){return score>=82?2.2:score>=65?1.6:1.0}
+function setupCanvas(cv,mul=1){const rect=cv.parentElement.getBoundingClientRect(),ratio=(window.devicePixelRatio||1)*mul;cv.width=Math.floor(rect.width*ratio);cv.height=Math.floor(rect.height*ratio);cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';return{ratio,w:rect.width,h:rect.height}}
+function getView(){const end=candles.length-viewOffset,start=Math.max(0,end-viewCount);return{start,end,cs:candles.slice(start,end)}}
+function draw(){renderChart($('chart'),1,false)}
+function renderChart(cv,mul=1,exporting=false){if(!analysis)return;const meta=setupCanvas(cv,mul),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.save();ctx.scale(meta.ratio,meta.ratio);const w=meta.w,h=meta.h,pad={l:48,r:92,t:20,b:44},plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,{start,end,cs}=getView();if(!cs.length){ctx.restore();return}let min=Math.min(...cs.map(x=>x.l)),max=Math.max(...cs.map(x=>x.h));[tradeSetup?.entry,tradeSetup?.sl,tradeSetup?.tp1,tradeSetup?.tp2,...analysis.levels.res.slice(0,3).map(z=>z.upper),...analysis.levels.sup.slice(0,3).map(z=>z.lower)].filter(Number.isFinite).forEach(v=>{min=Math.min(min,v);max=Math.max(max,v)});const extra=(max-min)*.10||1;min-=extra;max+=extra;const y=v=>pad.t+(max-v)/(max-min)*plotH,x=i=>pad.l+(i-start+.5)*plotW/(end-start),barW=Math.max(2,plotW/(end-start)*.58);chartGeom={pad,plotW,plotH,start,end,min,max,w,h};drawGrid(ctx,w,h,pad,min,max,y);drawZones(ctx,analysis.levels,y,pad,plotW);drawFVG(ctx,analysis.fvg,start,end,x,y,pad,plotW);drawOB(ctx,analysis.ob,start,end,x,y,pad,plotW);drawLiquidity(ctx,analysis.liq,y,pad,plotW);drawSeries(ctx,analysis.e20,start,end,x,y,css('--orange'),1.35,[]);drawSeries(ctx,analysis.e50,start,end,x,y,css('--blue'),1.45,[]);drawSeries(ctx,analysis.vwap,start,end,x,y,css('--violet'),1.15,[5,4]);drawCandles(ctx,cs,start,x,y,barW);drawTradeLines(ctx,tradeSetup,y,pad,plotW);drawPriceLine(ctx,analysis.last.c,y,pad,plotW);drawAxis(ctx,w,h,pad,cs,start,x);ctx.restore();if(exporting)return cv.toDataURL('image/png')}
+function drawGrid(ctx,w,h,pad,min,max,y){ctx.strokeStyle='rgba(148,163,184,.16)';ctx.lineWidth=1;ctx.font='10px JetBrains Mono';ctx.fillStyle='rgba(71,85,105,.88)';for(let i=0;i<=8;i++){const yy=pad.t+i*(h-pad.t-pad.b)/8;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillText(fmt(max-(max-min)*i/8,2),w-pad.r+6,yy+3)}for(let i=0;i<=10;i++){const xx=pad.l+i*(w-pad.l-pad.r)/10;ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,h-pad.b);ctx.stroke()}}
+function drawCandles(ctx,cs,start,x,y,bw){cs.forEach((c,idx)=>{const xx=x(start+idx),up=c.c>=c.o,clr=up?css('--green'):css('--red');ctx.strokeStyle=clr;ctx.fillStyle=clr;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,y(c.h));ctx.lineTo(xx,y(c.l));ctx.stroke();ctx.fillRect(xx-bw/2,Math.min(y(c.o),y(c.c)),bw,Math.max(1,Math.abs(y(c.o)-y(c.c))))})}
+function drawSeries(ctx,arr,start,end,x,y,clr,lw,dash){ctx.save();ctx.strokeStyle=clr;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();let first=true;for(let i=start;i<end;i++){if(!Number.isFinite(arr[i]))continue;if(first){ctx.moveTo(x(i),y(arr[i]));first=false}else ctx.lineTo(x(i),y(arr[i]))}ctx.stroke();ctx.restore()}
+function rightLabel(ctx,text,ypos,clr,pad,plotW){ctx.save();ctx.font='10px JetBrains Mono';ctx.fillStyle=clr;ctx.fillText(text,pad.l+plotW+8,ypos+3);ctx.restore()}
+function drawZones(ctx,levels,y,pad,plotW){[...levels.res.slice(0,3).map((z,i)=>({...z,k:'R',i:i+1,red:true})),...levels.sup.slice(0,3).map((z,i)=>({...z,k:'S',i:i+1,red:false}))].forEach(z=>{const score=zoneScore(z.red?'Resistance':'Support',z.lower,z.upper,z.touches),top=Math.min(y(z.upper),y(z.lower)),hh=Math.max(4,Math.abs(y(z.lower)-y(z.upper)));ctx.save();ctx.globalAlpha=prioAlpha(score);ctx.lineWidth=prioStroke(score);ctx.fillStyle=z.red?css('--resist'):css('--support');ctx.strokeStyle=z.red?'rgba(239,68,68,.50)':'rgba(22,163,74,.50)';ctx.setLineDash([7,4]);ctx.fillRect(pad.l,top,plotW,hh);ctx.beginPath();ctx.moveTo(pad.l,top+hh/2);ctx.lineTo(pad.l+plotW,top+hh/2);ctx.stroke();ctx.restore();if(score>=55)rightLabel(ctx,`${z.k}${z.i} ${fmt(z.price,0)}`,y(z.price),z.red?css('--red'):css('--green'),pad,plotW)})}
+function drawFVG(ctx,fvgs,start,end,x,y,pad,plotW){fvgs.slice(-8).forEach(g=>{if(g.end<start||g.i>end)return;const score=zoneScore('FVG',g.from,g.to,0),x1=Math.max(pad.l,x(g.i)),x2=Math.min(pad.l+plotW,x(Math.min(end-1,g.end+32))),top=Math.min(y(g.to),y(g.from)),hh=Math.max(4,Math.abs(y(g.from)-y(g.to)));ctx.save();ctx.globalAlpha=prioAlpha(score);ctx.lineWidth=prioStroke(score);ctx.fillStyle=g.type==='BULL'?css('--fvgBull'):css('--fvgBear');ctx.strokeStyle=g.type==='BULL'?'rgba(8,145,178,.55)':'rgba(245,158,11,.55)';ctx.fillRect(x1,top,Math.max(10,x2-x1),hh);ctx.strokeRect(x1,top,Math.max(10,x2-x1),hh);ctx.restore();if(score>=72)rightLabel(ctx,`FVG ${fmt(g.from,0)}-${fmt(g.to,0)}`,top+hh/2,g.type==='BULL'?css('--cyan'):css('--orange'),pad,plotW)})}
+function drawOB(ctx,obs,start,end,x,y,pad,plotW){obs.slice(-5).forEach(o=>{if(o.i<start-30||o.i>end)return;const score=zoneScore('OB',o.from,o.to,0),x1=Math.max(pad.l,x(o.i)-4),x2=Math.min(pad.l+plotW,x(Math.min(end-1,o.i+26))),top=Math.min(y(o.to),y(o.from)),hh=Math.max(4,Math.abs(y(o.from)-y(o.to)));ctx.save();ctx.globalAlpha=prioAlpha(score)*.75;ctx.fillStyle=css('--ob');ctx.strokeStyle='rgba(124,58,237,.35)';ctx.fillRect(x1,top,Math.max(10,x2-x1),hh);ctx.strokeRect(x1,top,Math.max(10,x2-x1),hh);ctx.restore()})}
+function drawLiquidity(ctx,liq,y,pad,plotW){liq.slice(0,6).forEach(l=>{const score=zoneScore('Liquidity',l.price,l.price,l.points||0),yy=y(l.price);ctx.save();ctx.globalAlpha=prioAlpha(score);ctx.strokeStyle='rgba(148,163,184,.95)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.restore()})}
+function drawTradeLines(ctx,t,y,pad,plotW){if(!t)return;[['SL',t.sl,css('--red')],['Entry',t.entry,css('--green')],['TP1',t.tp1,css('--cyan')],['TP2',t.tp2,css('--violet')]].forEach(([n,p,clr])=>{const yy=y(p);ctx.save();ctx.strokeStyle=clr;ctx.lineWidth=1.25;ctx.setLineDash(n==='SL'?[8,5]:[6,4]);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.restore();rightLabel(ctx,`${n} ${fmt(p,0)}`,yy,clr,pad,plotW)})}
+function drawPriceLine(ctx,price,y,pad,plotW){const yy=y(price);ctx.save();ctx.strokeStyle='rgba(22,163,74,.75)';ctx.lineWidth=1;ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.fillStyle=css('--green');ctx.fillRect(pad.l+plotW+4,yy-18,72,34);ctx.fillStyle='#fff';ctx.font='10px JetBrains Mono';ctx.fillText(fmt(price,2),pad.l+plotW+9,yy-4);ctx.fillText('12:34',pad.l+plotW+18,yy+10);ctx.restore()}
+function drawAxis(ctx,w,h,pad,cs,start,x){ctx.fillStyle='rgba(71,85,105,.86)';ctx.font='10px JetBrains Mono';const step=Math.max(1,Math.floor(cs.length/5));for(let j=0;j<cs.length;j+=step){const i=start+j,d=new Date(candles[i].t),txt=currentTF==='D1'?d.toLocaleDateString('en-GB',{month:'short',day:'2-digit'}):d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});ctx.fillText(txt,x(i)-20,h-15)}}
+function saveChartImage(){const temp=document.createElement('canvas');temp.style.width=$('chartArea').clientWidth+'px';temp.style.height=$('chartArea').clientHeight+'px';$('chartArea').appendChild(temp);try{const url=renderChart(temp,3,true),a=document.createElement('a');a.href=url;a.download=`${symbol}_${currentTF}_V8_HD.png`;a.click()}finally{temp.remove();draw()}}
+async function toggleFullscreenChart(){const root=$('appRoot');root.classList.toggle('fullscreenChart');try{if(root.classList.contains('fullscreenChart')&&root.requestFullscreen)await root.requestFullscreen();else if(document.fullscreenElement)await document.exitFullscreen()}catch(e){}try{if(root.classList.contains('fullscreenChart')&&screen.orientation?.lock)await screen.orientation.lock('landscape')}catch(e){}setTimeout(draw,160)}
+function openGuide(){$('guideModal').classList.add('open')}function closeGuide(){$('guideModal').classList.remove('open')}
+function toggleBoxZoom(){boxZoomMode=!boxZoomMode;$('boxZoomBtn').classList.toggle('active',boxZoomMode);$('boxZoomBtn').querySelector('small').textContent=boxZoomMode?'Box ON':'Box Zoom';$('chart').style.cursor=boxZoomMode?'zoom-in':'crosshair';if(!boxZoomMode)hideSelectionBox()}
+function hideSelectionBox(){$('selectionBox').style.display='none';selectState=null}
+function setupBoxZoom(){const area=$('chartArea'),pos=e=>{const p=e.touches?e.touches[0]:e,r=area.getBoundingClientRect();return{x:p.clientX-r.left,y:p.clientY-r.top}};area.addEventListener('pointerdown',e=>{if(!boxZoomMode||!chartGeom)return;const p=pos(e),b=$('selectionBox');selectState={x1:p.x,y1:p.y,x2:p.x,y2:p.y};b.style.display='block';b.style.left=p.x+'px';b.style.top=p.y+'px';b.style.width='0';b.style.height='0'});area.addEventListener('pointermove',e=>{if(!boxZoomMode||!selectState)return;const p=pos(e),b=$('selectionBox');selectState.x2=p.x;selectState.y2=p.y;const l=Math.min(selectState.x1,p.x),t=Math.min(selectState.y1,p.y),w=Math.abs(p.x-selectState.x1),h=Math.abs(p.y-selectState.y1);b.style.left=l+'px';b.style.top=t+'px';b.style.width=w+'px';b.style.height=h+'px'});const finish=()=>{if(!selectState||!chartGeom)return;const {pad,plotW,start,end}=chartGeom,left=Math.max(pad.l,Math.min(selectState.x1,selectState.x2)),right=Math.min(pad.l+plotW,Math.max(selectState.x1,selectState.x2));if(right-left>30){const span=end-start,idx1=Math.floor(start+((left-pad.l)/plotW)*span),idx2=Math.floor(start+((right-pad.l)/plotW)*span);viewCount=clamp(idx2-idx1+8,40,280);viewOffset=Math.max(0,candles.length-(idx2+2));draw()}hideSelectionBox()};area.addEventListener('pointerup',finish);area.addEventListener('pointercancel',hideSelectionBox)}
+function showCross(x,ypos){if(!analysis)return;$('crossV').style.display=$('crossH').style.display='block';$('crossV').style.left=x+'px';$('crossH').style.top=ypos+'px';const {start,end}=getView(),rect=$('chartArea').getBoundingClientRect(),pad=chartGeom?chartGeom.pad:{l:48,r:92},plotW=rect.width-pad.l-pad.r,idx=clamp(Math.floor((x-pad.l)/plotW*(end-start))+start,0,candles.length-1),c=candles[idx];if(c){const tip=$('tip');tip.style.display='block';tip.style.left=clamp(x+12,8,rect.width-225)+'px';tip.style.top=clamp(ypos+12,8,rect.height-130)+'px';tip.innerHTML=`<b>${new Date(c.t).toLocaleString('en-GB')}</b><br>O ${fmt(c.o,2)} H ${fmt(c.h,2)}<br>L ${fmt(c.l,2)} C ${fmt(c.c,2)}<br>VOL ${fmt(c.v,0)}`}}
+function enableAlerts(){alertEnabled=true;localStorage.setItem('btc_alerts','1');if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();speakArabic('تم تفعيل تنبيهات البيتكوين الصوتية بالعربية')}
+function speakArabic(text){try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.92;u.pitch=1;u.volume=1;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function checkSmartAlerts(){}
+function start(){if($('symbolInput'))$('symbolInput').value=symbol;if($('endpointInput'))$('endpointInput').value=metaEndpoint;setupBoxZoom();$('chartArea').addEventListener('mousemove',e=>{if(selectState)return;const r=$('chartArea').getBoundingClientRect();showCross(e.clientX-r.left,e.clientY-r.top)});$('chartArea').addEventListener('mouseleave',()=>{$('crossV').style.display=$('crossH').style.display=$('tip').style.display='none'});$('chartArea').addEventListener('wheel',e=>{e.preventDefault();e.deltaY<0?zoomIn():zoomOut()},{passive:false});refreshAll();setInterval(()=>loadTF(currentTF,true),15000)}
+start();
 </script>
 </body>
 </html>
