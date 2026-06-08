@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#f5f7fb"/>
-<title>BTC Pro Liquidity Engine V9.3 — Multi Asset Pro</title>
+<title>BTC Pro Liquidity Engine V9.4 — Pro Scale Sessions</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -141,6 +141,25 @@ button,input,select{font-family:inherit}
 .exportNote{font-size:10px;color:var(--muted)}
 @media(max-width:980px){.assetSelect{font-size:14px}.layerStrip{justify-content:flex-start}.chartMeta{font-size:9px}}
 
+
+/* V9.4 scale, stable status, fullscreen controls */
+.apiStatus{min-width:132px;justify-content:center;text-align:center}
+.apiStatus.ok,.apiStatus.warn,.apiStatus.err{min-width:132px}
+.chartHead{min-height:38px}
+.layerStrip{min-height:38px}
+.fsToolbar{display:none;position:absolute;left:10px;right:10px;bottom:10px;z-index:30;gap:6px;align-items:center;justify-content:center;padding:8px;border:1px solid rgba(217,226,236,.7);border-radius:16px;background:rgba(255,255,255,.82);backdrop-filter:blur(12px);box-shadow:var(--shadow2)}
+.fsBtn{height:34px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 9px;font-size:11px;font-weight:900;color:#263244;cursor:pointer}
+.fsBtn.on{background:rgba(8,145,178,.10);border-color:rgba(8,145,178,.38);color:var(--cyan)}
+.fullscreenChart .topbar{display:none}
+.fullscreenChart .main{padding:0!important;display:block!important;height:100vh}
+.fullscreenChart .chartCard{height:100vh!important;border-radius:0!important}
+.fullscreenChart .chartHead{height:36px}
+.fullscreenChart .layerStrip{position:absolute;top:38px;left:0;right:0;z-index:25;background:rgba(255,255,255,.80);backdrop-filter:blur(10px)}
+.fullscreenChart .chartWrap{height:calc(100vh - 36px)!important;padding-top:38px}
+.fullscreenChart .fsToolbar{display:flex}
+.fullscreenChart .legend,.fullscreenChart .sideCard,.fullscreenChart .controls{display:none!important}
+.fullscreenChart .chartWrap:before{content:"Landscape Fullscreen • استخدم الأزرار للتحكم بالطبقات والزوم والتحريك";position:absolute;top:48px;left:12px;z-index:20;font-size:10px;color:rgba(71,85,105,.75);background:rgba(255,255,255,.75);border:1px solid rgba(217,226,236,.8);border-radius:999px;padding:4px 9px}
+
 </style>
 </head>
 <body>
@@ -148,7 +167,7 @@ button,input,select{font-family:inherit}
   <header class="topbar">
     <div class="brand">
       <div class="logo">₿</div>
-      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9.3</span></h1><p>BTC • GOLD • SILVER • MetaAPI Safe Mode</p></div>
+      <div><h1>BTC PRO LIQUIDITY ENGINE <span>V9.4</span></h1><p>BTC • GOLD • SILVER • MetaAPI Safe Mode</p></div>
     </div>
     <div class="selectorRow">
       <div class="selectPill"><span class="btcMini" id="assetIcon">₿</span><select class="assetSelect" id="assetSelect" onchange="changeAsset(this.value)"><option value="BTCUSD">BTCUSD</option><option value="XAUUSD">XAUUSD</option><option value="XAGUSD">XAGUSD</option></select></div>
@@ -186,12 +205,27 @@ button,input,select{font-family:inherit}
         <button class="layerBtn fvg on" data-layer="fvg" onclick="toggleLayer('fvg')">FVG</button>
         <button class="layerBtn ob on" data-layer="ob" onclick="toggleLayer('ob')">OB</button>
         <button class="layerBtn liq on" data-layer="liquidity" onclick="toggleLayer('liquidity')">Liquidity</button>
+        <button class="layerBtn on" data-layer="sessions" onclick="toggleLayer('sessions')">Sessions H/L</button>
         <button class="layerBtn on" data-layer="trade" onclick="toggleLayer('trade')">Entry/SL/TP</button>
       </div>
       <div class="chartWrap" id="chartArea">
         <div class="dataBanner" id="dataBanner"><span class="warnIcon">⚠️</span><div><b>MetaAPI غير متصل — التداول مقفل</b><span id="dataErrorText">لا توجد بيانات حقيقية. لن يتم تشغيل Demo حتى لا تتداول على سعر خاطئ.</span></div></div>
         <canvas id="chart"></canvas>
         <div class="selectionBox" id="selectionBox"></div>
+        <div class="fsToolbar" id="fsToolbar">
+          <button class="fsBtn" onclick="toggleFullscreenChart()">خروج</button>
+          <button class="fsBtn" onclick="zoomIn()">Zoom +</button>
+          <button class="fsBtn" onclick="zoomOut()">Zoom -</button>
+          <button class="fsBtn" onclick="shiftView(-20)">◀ Pan</button>
+          <button class="fsBtn" onclick="shiftView(20)">Pan ▶</button>
+          <button class="fsBtn" onclick="toggleBoxZoom()">Box</button>
+          <button class="fsBtn" onclick="toggleLayer('buyBlock')">Buy</button>
+          <button class="fsBtn" onclick="toggleLayer('sellBlock')">Sell</button>
+          <button class="fsBtn" onclick="toggleLayer('fvg')">FVG</button>
+          <button class="fsBtn" onclick="toggleLayer('ob')">OB</button>
+          <button class="fsBtn" onclick="toggleLayer('liquidity')">Liq</button>
+          <button class="fsBtn" onclick="toggleLayer('sessions')">Sessions</button>
+        </div>
         <div class="cross v" id="crossV"></div><div class="cross h" id="crossH"></div><div class="tooltip" id="tip"></div>
       </div>
       <div class="legend">
@@ -348,13 +382,18 @@ let symbol=localStorage.getItem('btc_meta_symbol')||'BTCUSD';
 let metaEndpoint=localStorage.getItem('btc_meta_endpoint')||'/api/metaapi-candles';
 let currentTF='M15', candles=[], tfCache={}, analysis=null, tradeSetup=null, dataStatus='checking', dataError='', lastGoodAt=null;
 let viewCount=150, viewOffset=0, alertEnabled=false, lastAlertKey='', lastAlertTime=0;
-let autoFocus=false, boxZoomMode=false, selectState=null, chartGeom=null; let layers={buyBlock:true,sellBlock:true,fvg:true,ob:true,liquidity:true,trade:true};
+let autoFocus=false, boxZoomMode=false, selectState=null, chartGeom=null; let layers={buyBlock:true,sellBlock:true,fvg:true,ob:true,liquidity:true,sessions:true,trade:true};
 const $=id=>document.getElementById(id);
 const fmt=(n,d=2)=>Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d}):'---';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
-function normalizeCandle(k){if(Array.isArray(k)) return {t:+k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+(k[5]||0)}; const t=k.time?new Date(k.time).getTime():(k.brokerTime?new Date(k.brokerTime.replace(' ','T')+'Z').getTime():Date.now()); return {t,o:+k.open,h:+k.high,l:+k.low,c:+k.close,v:+(k.tickVolume??k.volume??0)};}
+function normalizeCandle(k){
+  if(Array.isArray(k)) return {t:+k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+(k[5]||0),state:'complete'};
+  const t=k.time?new Date(k.time).getTime():(k.brokerTime?new Date(String(k.brokerTime).replace(' ','T')+'Z').getTime():Date.now());
+  const endTime=k.endTime?new Date(k.endTime).getTime():(k.endBrokerTime?new Date(String(k.endBrokerTime).replace(' ','T')+'Z').getTime():null);
+  return {t,o:+k.open,h:+k.high,l:+k.low,c:+k.close,v:+(k.tickVolume??k.volume??0),state:k.state||'',endTime};
+}
 async function fetchCandles(tf){
   const timeframe=TF_MAP[tf]||'15m';
   const sep=metaEndpoint.includes('?')?'&':'?';
@@ -366,12 +405,12 @@ async function fetchCandles(tf){
     throw new Error(`MetaAPI ${r.status}: ${detail}`);
   }
   const data=Array.isArray(payload)?payload:(payload?.candles||payload?.data||[]);
-  const out=data.map(normalizeCandle).filter(x=>Number.isFinite(x.o)&&Number.isFinite(x.h)&&Number.isFinite(x.l)&&Number.isFinite(x.c));
+  const out=data.map(normalizeCandle).filter(x=>Number.isFinite(x.o)&&Number.isFinite(x.h)&&Number.isFinite(x.l)&&Number.isFinite(x.c)).filter(isCompleteCandle);
   if(!out.length)throw new Error('MetaAPI returned zero candles');
   return out.sort((a,b)=>a.t-b.t);
 }
 async function loadTF(tf,force=false){
-  currentTF=tf; setActiveTF(tf); setDataStatus('checking','جاري تحميل بيانات MetaAPI...');
+  currentTF=tf; setActiveTF(tf); if(dataStatus!=='ok'||!candles.length)setDataStatus('checking','جاري تحميل بيانات MetaAPI...');
   if(!force&&tfCache[tf]){candles=tfCache[tf];setDataStatus('ok');try{updateAll();}catch(uiErr){console.error('UI update error',uiErr);setDataStatus('err','UI update error: '+(uiErr.message||uiErr));renderNoData();}return;}
   try{
     const fresh=await fetchCandles(tf);
@@ -384,7 +423,7 @@ async function loadTF(tf,force=false){
   }
 }
 async function refreshAll(){
-  setDataStatus('checking','جاري اختبار الاتصال ببيانات MetaAPI...');
+  if(dataStatus!=='ok'||!candles.length)setDataStatus('checking','جاري اختبار الاتصال ببيانات MetaAPI...');
   const frames=['D1','H4','H1','M15',currentTF];
   const results=await Promise.allSettled(frames.map(tf=>fetchCandles(tf).then(data=>({tf,data}))));
   let currentOk=false, firstErr='';
@@ -455,18 +494,33 @@ function drawExportGuide(ctx,x,y,w){
 }
 async function saveCompositeImage(){
   if(!analysis)return saveChartImage();
-  const chartW=1180,chartH=650,sideW=360,headH=92,guideH=150,pad=24;
-  const out=document.createElement('canvas');out.width=chartW+sideW+pad*3;out.height=headH+chartH+guideH+pad*3;const ctx=out.getContext('2d');
-  ctx.fillStyle='#f3f6fa';ctx.fillRect(0,0,out.width,out.height);
-  ctx.fillStyle='#152033';ctx.font='900 28px Cairo';ctx.textAlign='left';ctx.fillText(`BTC PRO LIQUIDITY ENGINE V9.3`,pad,46);
-  ctx.font='900 17px JetBrains Mono';ctx.fillStyle='#16a34a';ctx.fillText(`${symbol} • ${currentTF} • METAAPI LIVE • LAST ${lastCandleTime()}`,pad,75);
+  const out=document.createElement('canvas'),W=1920,H=1080;out.width=W;out.height=H;const ctx=out.getContext('2d');
+  ctx.fillStyle='#f3f6fa';ctx.fillRect(0,0,W,H);
+  const pad=28,headH=86,chartW=1370,chartH=720,sideW=460,guideH=210;
+  ctx.fillStyle='#152033';ctx.font='900 34px Cairo';ctx.textAlign='left';ctx.fillText(`BTC PRO LIQUIDITY ENGINE V9.4`,pad,44);
+  ctx.font='900 19px JetBrains Mono';ctx.fillStyle='#16a34a';ctx.fillText(`${symbol} • ${currentTF} • METAAPI LIVE • LAST ${lastCandleTime()} • ${candles.length} candles`,pad,75);
   const temp=document.createElement('canvas');temp.style.width=chartW+'px';temp.style.height=chartH+'px';document.body.appendChild(temp);
-  try{renderChart(temp,2,true);await new Promise(r=>setTimeout(r,30));ctx.drawImage(temp,pad,headH+pad,chartW,chartH);}finally{temp.remove();}
-  const zones=collectZones().slice(0,6);const sx=pad*2+chartW,sy=headH+pad;ctx.fillStyle='#fff';ctx.strokeStyle='rgba(217,226,236,.9)';roundRect(ctx,sx,sy,sideW,chartH,16,true,true);
-  ctx.fillStyle='#152033';ctx.font='900 20px Cairo';ctx.textAlign='right';ctx.fillText('Priority Zones',sx+sideW-20,sy+34);
-  let yy=sy+68;zones.forEach((z,i)=>{ctx.fillStyle=z.class==='red'?'rgba(239,68,68,.08)':z.class==='green'?'rgba(22,163,74,.08)':'rgba(245,158,11,.08)';roundRect(ctx,sx+16,yy-22,sideW-32,58,12,true,true);ctx.fillStyle=z.class==='red'?'#dc2626':z.class==='green'?'#16a34a':'#f59e0b';ctx.font='900 18px JetBrains Mono';ctx.textAlign='left';ctx.fillText(String(i+1),sx+28,yy);ctx.textAlign='right';ctx.fillText(String(z.score),sx+sideW-28,yy);ctx.fillStyle='#152033';ctx.font='900 13px Cairo';ctx.fillText(`${z.kind}`,sx+sideW-70,yy-6);ctx.font='11px JetBrains Mono';ctx.fillStyle='#475569';ctx.fillText(`${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}`,sx+sideW-70,yy+12);yy+=68;});
-  drawExportGuide(ctx,pad,headH+chartH+pad*2,chartW+sideW+pad,guideH-20);
-  const a=document.createElement('a');a.href=out.toDataURL('image/png');a.download=`${symbol}_${currentTF}_V9_3_FULL_GUIDE.png`;a.click();
+  try{renderChart(temp,2,true);await new Promise(r=>setTimeout(r,30));ctx.drawImage(temp,pad,headH,chartW,chartH);}finally{temp.remove();}
+  const sx=pad+chartW+20,sy=headH;ctx.fillStyle='#fff';ctx.strokeStyle='rgba(217,226,236,.9)';roundRect(ctx,sx,sy,sideW,chartH,16,true,true);
+  ctx.fillStyle='#152033';ctx.font='900 22px Cairo';ctx.textAlign='right';ctx.fillText('Priority Zones',sx+sideW-20,sy+36);
+  let yy=sy+72;collectZones().slice(0,7).forEach((z,i)=>{ctx.fillStyle=z.class==='red'?'rgba(239,68,68,.08)':z.class==='green'?'rgba(22,163,74,.08)':'rgba(245,158,11,.08)';roundRect(ctx,sx+16,yy-24,sideW-32,62,12,true,true);ctx.fillStyle=z.class==='red'?'#dc2626':z.class==='green'?'#16a34a':'#f59e0b';ctx.font='900 20px JetBrains Mono';ctx.textAlign='left';ctx.fillText(String(i+1),sx+30,yy);ctx.textAlign='right';ctx.fillText(String(z.score),sx+sideW-28,yy);ctx.fillStyle='#152033';ctx.font='900 14px Cairo';ctx.fillText(`${z.kind}`,sx+sideW-80,yy-7);ctx.font='12px JetBrains Mono';ctx.fillStyle='#475569';ctx.fillText(`${fmt(z.low,0)}${z.low!==z.high?' - '+fmt(z.high,0):''}`,sx+sideW-80,yy+13);yy+=70;});
+  drawExportGuide(ctx,pad,H-guideH-pad,W-pad*2);
+  const a=document.createElement('a');a.href=out.toDataURL('image/png');a.download=`${symbol}_${currentTF}_V9_4_LANDSCAPE_GUIDE.png`;a.click();
+}
+
+function timeframeMs(tf){return {M5:300000,M15:900000,M30:1800000,H1:3600000,H4:14400000,D1:86400000}[tf]||900000}
+function isCompleteCandle(c){
+  if(c.state && String(c.state).toLowerCase()!=='complete')return false;
+  if(c.endTime && Number.isFinite(c.endTime))return c.endTime <= Date.now()-1500;
+  return true;
+}
+function sessionName(h){if(h>=0&&h<8)return'ASIA';if(h>=8&&h<13)return'EU';if(h>=13&&h<22)return'US';return'OFF'}
+function sessionColor(n){return n==='ASIA'?'#0891b2':n==='EU'?'#7c3aed':n==='US'?'#f59e0b':'#94a3b8'}
+function drawSessionHL(ctx,cs,start,x,y,pad,plotW){
+  if(!layers.sessions)return;
+  const groups={};
+  cs.forEach((c,idx)=>{const d=new Date(c.t),day=d.toISOString().slice(0,10),s=sessionName(d.getUTCHours());if(s==='OFF')return;const key=day+' '+s;if(!groups[key])groups[key]={s,hi:-Infinity,lo:Infinity,hiI:start+idx,loI:start+idx};if(c.h>groups[key].hi){groups[key].hi=c.h;groups[key].hiI=start+idx}if(c.l<groups[key].lo){groups[key].lo=c.l;groups[key].loI=start+idx}});
+  Object.values(groups).slice(-9).forEach(g=>{const col=sessionColor(g.s);[['H',g.hi,g.hiI],['L',g.lo,g.loI]].forEach(([type,price,i])=>{const yy=y(price);if(yy<pad.t||yy>pad.t+chartGeom.plotH)return;ctx.save();ctx.strokeStyle=col;ctx.globalAlpha=.62;ctx.lineWidth=1;ctx.setLineDash(type==='H'?[8,5]:[3,6]);ctx.beginPath();ctx.moveTo(Math.max(pad.l,x(i)-30),yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.fillStyle=col;ctx.font='900 9px JetBrains Mono';ctx.textAlign='right';ctx.fillText(`${g.s} ${type}`,pad.l+plotW-6,yy-3);ctx.restore();});});
 }
 function setActiveTF(tf){
   document.querySelectorAll('.tfBtn').forEach(b=>b.classList.toggle('active',b.dataset.tf===tf));
@@ -573,7 +627,7 @@ function prioStroke(score){return score>=82?2.2:score>=65?1.6:1.0}
 function setupCanvas(cv,mul=1){const rect=cv.parentElement.getBoundingClientRect(),ratio=(window.devicePixelRatio||1)*mul;cv.width=Math.floor(rect.width*ratio);cv.height=Math.floor(rect.height*ratio);cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';return{ratio,w:rect.width,h:rect.height}}
 function getView(){const end=candles.length-viewOffset,start=Math.max(0,end-viewCount);return{start,end,cs:candles.slice(start,end)}}
 function draw(){renderChart($('chart'),1,false)}
-function renderChart(cv,mul=1,exporting=false){if(!analysis)return;const meta=setupCanvas(cv,mul),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.save();ctx.scale(meta.ratio,meta.ratio);const w=meta.w,h=meta.h,pad={l:48,r:150,t:20,b:44},plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,{start,end,cs}=getView();if(!cs.length){ctx.restore();return}let min=Math.min(...cs.map(x=>x.l)),max=Math.max(...cs.map(x=>x.h));[tradeSetup?.entry,tradeSetup?.sl,tradeSetup?.tp1,tradeSetup?.tp2,...analysis.levels.res.slice(0,3).map(z=>z.upper),...analysis.levels.sup.slice(0,3).map(z=>z.lower)].filter(Number.isFinite).forEach(v=>{min=Math.min(min,v);max=Math.max(max,v)});const extra=(max-min)*.10||1;min-=extra;max+=extra;const y=v=>pad.t+(max-v)/(max-min)*plotH,x=i=>pad.l+(i-start+.5)*plotW/(end-start),barW=Math.max(2,plotW/(end-start)*.58);chartGeom={pad,plotW,plotH,start,end,min,max,w,h};drawGrid(ctx,w,h,pad,min,max,y);drawZones(ctx,analysis.levels,y,pad,plotW);drawFVG(ctx,analysis.fvg,start,end,x,y,pad,plotW);drawOB(ctx,analysis.ob,start,end,x,y,pad,plotW);drawLiquidity(ctx,analysis.liq,y,pad,plotW);drawSeries(ctx,analysis.e20,start,end,x,y,css('--orange'),1.35,[]);drawSeries(ctx,analysis.e50,start,end,x,y,css('--blue'),1.45,[]);drawSeries(ctx,analysis.vwap,start,end,x,y,css('--violet'),1.15,[5,4]);drawCandles(ctx,cs,start,x,y,barW);drawTradeLines(ctx,tradeSetup,y,pad,plotW);drawPriceLine(ctx,analysis.last.c,y,pad,plotW);drawAxis(ctx,w,h,pad,cs,start,x);ctx.restore();if(exporting)return cv.toDataURL('image/png')}
+function renderChart(cv,mul=1,exporting=false){if(!analysis)return;const meta=setupCanvas(cv,mul),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.save();ctx.scale(meta.ratio,meta.ratio);const w=meta.w,h=meta.h,pad={l:48,r:96,t:20,b:44},plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,{start,end,cs}=getView();if(!cs.length){ctx.restore();return}let min=Math.min(...cs.map(x=>x.l)),max=Math.max(...cs.map(x=>x.h));const extra=(max-min)*.055||1;min-=extra;max+=extra;const y=v=>pad.t+(max-v)/(max-min)*plotH,x=i=>pad.l+(i-start+.5)*plotW/(end-start),barW=Math.max(2,plotW/(end-start)*.58);chartGeom={pad,plotW,plotH,start,end,min,max,w,h};drawGrid(ctx,w,h,pad,min,max,y);drawSessionHL(ctx,cs,start,x,y,pad,plotW);drawZones(ctx,analysis.levels,y,pad,plotW);drawFVG(ctx,analysis.fvg,start,end,x,y,pad,plotW);drawOB(ctx,analysis.ob,start,end,x,y,pad,plotW);drawLiquidity(ctx,analysis.liq,y,pad,plotW);drawSeries(ctx,analysis.e20,start,end,x,y,css('--orange'),1.35,[]);drawSeries(ctx,analysis.e50,start,end,x,y,css('--blue'),1.45,[]);drawSeries(ctx,analysis.vwap,start,end,x,y,css('--violet'),1.15,[5,4]);drawCandles(ctx,cs,start,x,y,barW);drawTradeLines(ctx,tradeSetup,y,pad,plotW);drawPriceLine(ctx,analysis.last.c,y,pad,plotW);drawAxis(ctx,w,h,pad,cs,start,x);ctx.restore();if(exporting)return cv.toDataURL('image/png')}
 function drawGrid(ctx,w,h,pad,min,max,y){ctx.strokeStyle='rgba(148,163,184,.16)';ctx.lineWidth=1;ctx.font='10px JetBrains Mono';ctx.fillStyle='rgba(71,85,105,.88)';for(let i=0;i<=8;i++){const yy=pad.t+i*(h-pad.t-pad.b)/8;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillText(fmt(max-(max-min)*i/8,2),w-pad.r+6,yy+3)}for(let i=0;i<=10;i++){const xx=pad.l+i*(w-pad.l-pad.r)/10;ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,h-pad.b);ctx.stroke()}}
 function drawCandles(ctx,cs,start,x,y,bw){cs.forEach((c,idx)=>{const xx=x(start+idx),up=c.c>=c.o,clr=up?css('--green'):css('--red');ctx.strokeStyle=clr;ctx.fillStyle=clr;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,y(c.h));ctx.lineTo(xx,y(c.l));ctx.stroke();ctx.fillRect(xx-bw/2,Math.min(y(c.o),y(c.c)),bw,Math.max(1,Math.abs(y(c.o)-y(c.c))))})}
 function drawSeries(ctx,arr,start,end,x,y,clr,lw,dash){ctx.save();ctx.strokeStyle=clr;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();let first=true;for(let i=start;i<end;i++){if(!Number.isFinite(arr[i]))continue;if(first){ctx.moveTo(x(i),y(arr[i]));first=false}else ctx.lineTo(x(i),y(arr[i]))}ctx.stroke();ctx.restore()}
@@ -612,7 +666,12 @@ function drawTradeLines(ctx,t,y,pad,plotW){
 }
 function drawPriceLine(ctx,price,y,pad,plotW){
   const yy=y(price);ctx.save();ctx.strokeStyle='rgba(22,163,74,.75)';ctx.lineWidth=1;ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(pad.l+plotW,yy);ctx.stroke();ctx.setLineDash([]);
-  const tagX=pad.l+plotW+10,tagW=Math.max(96,Math.min(pad.r-18,132));ctx.fillStyle=css('--green');ctx.fillRect(tagX,yy-18,tagW,34);ctx.fillStyle='#fff';ctx.font='10px JetBrains Mono';ctx.textAlign='center';ctx.fillText(fmt(price,2),tagX+tagW/2,yy-4);ctx.fillText(lastCandleTime().slice(0,5),tagX+tagW/2,yy+10);ctx.restore();
+  const tagW=pad.r-14,tagX=pad.l+plotW+7,tagH=28;
+  ctx.fillStyle=css('--green');ctx.fillRect(tagX,yy-tagH/2,tagW,tagH);
+  ctx.fillStyle='#fff';ctx.font='900 9px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText(fmt(price,2),tagX+tagW/2,yy-2);
+  ctx.font='8px JetBrains Mono';ctx.fillText(lastCandleTime().slice(0,5),tagX+tagW/2,yy+10);
+  ctx.restore();
 }
 function drawAxis(ctx,w,h,pad,cs,start,x){ctx.fillStyle='rgba(71,85,105,.86)';ctx.font='10px JetBrains Mono';const step=Math.max(1,Math.floor(cs.length/5));for(let j=0;j<cs.length;j+=step){const i=start+j,d=new Date(candles[i].t),txt=currentTF==='D1'?d.toLocaleDateString('en-GB',{month:'short',day:'2-digit'}):d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});ctx.fillText(txt,x(i)-20,h-15)}}
 function saveChartImage(){const temp=document.createElement('canvas');temp.style.width=$('chartArea').clientWidth+'px';temp.style.height=$('chartArea').clientHeight+'px';$('chartArea').appendChild(temp);try{const url=renderChart(temp,3,true),a=document.createElement('a');a.href=url;a.download=`${symbol}_${currentTF}_V8_HD.png`;a.click()}finally{temp.remove();draw()}}
