@@ -1,29 +1,20 @@
-# BTC / XAU / XAG Pro Liquidity Engine V10
+# BTC / XAU / XAG Pro Liquidity Engine V10.4
 
-No demo fallback. If MetaAPI or news is not configured, the system shows NO DATA / NEWS OFF.
+No demo fallback.
 
-## Files
-- `index.html`
-- `api/metaapi-candles.js`
-- `api/economic-calendar.js`
-- `api/telegram-alert.js`
+V10.4 changes:
+- Stronger Range / Consolidation / Sweep Trap logic.
+- Adds Sweep Trap school with BUY / SELL / RANGE and score.
+- Draws range high / range low context and sweep trap labels.
+- MT5-style right price axis: current price tag is inside the right axis strip, not over the candles.
+- Support and Resistance show price tags on the right axis strip.
 
-## Required Vercel Environment Variables
-```
-METAAPI_TOKEN=...
-METAAPI_ACCOUNT_ID=...
-METAAPI_REGION=new-york
-```
+Required Vercel variables:
+METAAPI_TOKEN
+METAAPI_ACCOUNT_ID
+METAAPI_REGION
 
-## Optional
-```
-ECONOMIC_CALENDAR_URL=https://your-provider/calendar?from={from}&to={to}
-TELEGRAM_BOT_TOKEN=...
-TELEGRAM_CHAT_ID=...
-```
-
-## Notes
-- Browser audio alerts work while the page/PWA is open.
-- Reliable alerts while the page is closed require Telegram or a true push backend/external cron.
-- Self-learning journal is stored locally in the browser and can be exported as JSON.
-- Backtest fetches real MetaAPI candles only; no synthetic candles are generated.
+Optional:
+ECONOMIC_CALENDAR_URL
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
