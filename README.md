@@ -1,12 +1,13 @@
-# BTC / XAU / XAG Pro Liquidity Engine V10.6
+# BTC / XAU / XAG Pro Liquidity Engine V10.7
 
 No demo fallback.
 
-V10.6:
-- Backtest now first tries historical MetaAPI range.
-- If the historical range returns 0 candles, it can use the real loaded chart candles as fallback.
-- Backtest result shows the source used and debug batches.
-- Useful when broker/MetaAPI historical startTime endpoint behaves differently but the live chart is already loaded.
+V10.7:
+- Live price refresh every 3 seconds using latest real MetaAPI candle including current forming candle.
+- Full chart refresh every 30 seconds to avoid API pressure.
+- Backtest can read uploaded CSV/JSON candle files.
+- Backtest exports Excel-compatible .xls file with every trade and reason.
+- Required candle columns: time, open, high, low, close, volume or tickVolume.
 
 Required:
 METAAPI_TOKEN
