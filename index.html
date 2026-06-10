@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#0b1220"/>
-<title>BTC / XAU / XAG Pro Liquidity Engine V10.4</title>
+<title>BTC / XAU / XAG Pro Liquidity Engine V10.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -110,6 +110,9 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
 .chartCanvas{background:#f8fafc}
 .axisNote{font-family:'JetBrains Mono';font-weight:900}
 
+
+/* V10.5 clean price axis + visible signal labels */
+.signalBadge{font-weight:900}
 </style>
 </head>
 <body>
@@ -118,8 +121,8 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
   <div class="brand">
     <div class="brandIcon"><span id="brandIcons">₿ 🥇 🥈</span></div>
     <div>
-      <h1>BTC / XAU / XAG <b>PRO LIQUIDITY ENGINE V10.4</b></h1>
-      <p>MetaAPI Safe Mode • No Demo • Sweep Trap + MT5 Axis Desk</p>
+      <h1>BTC / XAU / XAG <b>PRO LIQUIDITY ENGINE V10.6</b></h1>
+      <p>MetaAPI Safe Mode • No Demo • Backtest Live Fallback Desk</p>
       <small>تصميم وبرمجة المهندس أحمد ناصر — 03715512</small>
     </div>
   </div>
@@ -175,6 +178,7 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
         <button class="layerBtn on" data-layer="liquidity" onclick="toggleLayer('liquidity')">Liquidity</button>
         <button class="layerBtn on" data-layer="killzone" onclick="toggleLayer('killzone')">Kill Zone</button>
         <button class="layerBtn on" data-layer="sessions" onclick="toggleLayer('sessions')">Asia/EU/US H/L</button>
+        <button class="layerBtn gold on" data-layer="signals" onclick="toggleLayer('signals')">Signals</button>
         <button class="layerBtn on" data-layer="fvg" onclick="toggleLayer('fvg')">FVG</button>
         <button class="layerBtn on" data-layer="ob" onclick="toggleLayer('ob')">OB</button>
         <button class="layerBtn on" data-layer="boll" onclick="toggleLayer('boll')">Bollinger</button>
@@ -247,7 +251,7 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
   <div class="modalBox">
     <div class="modalHead"><h2>Backtest حقيقي من MetaAPI</h2><button class="btn" onclick="closeBacktest()">إغلاق</button></div>
     <p style="color:var(--muted);font-size:12px;margin-bottom:10px">لا يوجد Demo. الاختبار يعتمد على شموع MetaAPI فقط. اختر التواريخ والفريم.</p>
-    <div class="btHint">اختر الفترة بوضوح. إذا وضعت التاريخين بالعكس سيقوم النظام بتصحيحهما تلقائيًا.</div>
+    <div class="btHint">اختر الفترة بوضوح. إذا لم يرجع MetaAPI شموعًا تاريخية، سيستخدم النظام الشموع الحقيقية المحمّلة في الشارت كخطة احتياطية.</div>
     <div class="btRow">
       <div class="btField"><label>FROM</label><input class="input" type="date" id="btFrom"></div>
       <div class="btField"><label>TO</label><input class="input" type="date" id="btTo"></div>
@@ -273,7 +277,7 @@ let endpoint=localStorage.getItem('v10_endpoint')||'/api/metaapi-candles';
 let dxySymbol=localStorage.getItem('v10_dxy')||'DXY';
 let candles=[], analysis=null, viewCount=160, viewOffset=0, geom=null, apiOK=false, newsList=[], lastNewsAlert={};
 let audioAlerts=localStorage.getItem('v10_audio')!=='0';
-let layers={support:true,resistance:true,liquidity:true,killzone:true,sessions:true,fvg:true,ob:true,boll:true,ema:true,vwap:true,rsi:true,macd:true};
+let layers={support:true,resistance:true,liquidity:true,killzone:true,sessions:true,signals:true,fvg:true,ob:true,boll:true,ema:true,vwap:true,rsi:true,macd:true};
 let journal=JSON.parse(localStorage.getItem('v10_journal')||'[]');
 const assetInfo=s=>s.startsWith('XAU')?{icon:'🥇',label:'GOLD'}:s.startsWith('XAG')?{icon:'🥈',label:'SILVER'}:{icon:'₿',label:'BTC'};
 function tfMs(tf){return ({M5:300000,M15:900000,M30:1800000,H1:3600000,H4:14400000,D1:86400000}[tf]||900000)}
@@ -296,6 +300,7 @@ async function fetchCandles(sym=symbol,tf=currentTF,limit=600,from='',to=''){
   return arr;
 }
 async function fetchRangeCandles(sym=symbol,tf=currentTF,from='',to='',maxCandles=8000){
+  window.__btDebug=[];
   if(!from||!to) return fetchCandles(sym,tf,1000,from);
   let fromTs=new Date(from+'T00:00:00').getTime();
   let toTs=new Date(to+'T23:59:59').getTime();
@@ -303,10 +308,9 @@ async function fetchRangeCandles(sym=symbol,tf=currentTF,from='',to='',maxCandle
   if(fromTs>toTs){const tmp=fromTs;fromTs=toTs;toTs=tmp;}
   const out=[];let cursor=fromTs;
   const step={ '5m':300000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000 }[TF[tf]||tf]||900000;
-  let lastBatchInfo='';
   for(let guard=0;guard<30 && cursor<=toTs && out.length<maxCandles;guard++){
     const batch=await fetchCandles(sym,tf,1000,new Date(cursor).toISOString());
-    lastBatchInfo=`batch ${guard+1}: received ${batch.length}, first ${batch[0]?new Date(batch[0].t).toISOString():'none'}, last ${batch.at(-1)?new Date(batch.at(-1).t).toISOString():'none'}`;
+    window.__btDebug.push(`batch ${guard+1}: requested ${new Date(cursor).toISOString()} / got ${batch.length} / first ${batch[0]?new Date(batch[0].t).toISOString():'none'} / last ${batch.at(-1)?new Date(batch.at(-1).t).toISOString():'none'}`);
     const clean=batch.filter(c=>c.t>=fromTs && c.t<=toTs);
     clean.forEach(c=>{if(!out.length||c.t>out.at(-1).t)out.push(c)});
     if(!batch.length)break;
@@ -315,7 +319,6 @@ async function fetchRangeCandles(sym=symbol,tf=currentTF,from='',to='',maxCandle
     cursor=next;
     if(batch.at(-1).t>=toTs)break;
   }
-  out.debugInfo={from:new Date(fromTs).toISOString(),to:new Date(toTs).toISOString(),lastBatchInfo};
   return out.slice(0,maxCandles);
 }
 function ema(vals,p){let out=[],k=2/(p+1),prev=vals[0];for(let i=0;i<vals.length;i++){prev=i?vals[i]*k+prev*(1-k):vals[i];out.push(prev)}return out}
@@ -385,23 +388,142 @@ function setupCanvas(cv){const r=cv.parentElement.getBoundingClientRect(),d=wind
 function view(){const end=candles.length-viewOffset,start=Math.max(0,end-viewCount);return{start,end,cs:candles.slice(start,end)}}
 function drawAll(){drawChart();drawRSI();drawMACD()}
 function scale(cs,pad,h){let min=Math.min(...cs.map(c=>c.l)),max=Math.max(...cs.map(c=>c.h));const e=(max-min)*.06||1;return{min:min-e,max:max+e,y:v=>pad.t+(max+e-v)/(max-min+e*2)*(h-pad.t-pad.b)}}
-function drawChart(){if(!analysis)return;const cv=$('chart'),{ctx,w,h}=setupCanvas(cv),pad={l:50,r:96,t:22,b:36},vw=w-pad.l-pad.r,vh=h-pad.t-pad.b,{start,end,cs}=view();ctx.clearRect(0,0,w,h);ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,w,h);const sc=scale(cs,pad,h),x=i=>pad.l+(i-start+.5)*vw/(end-start),bw=Math.max(2,vw/(end-start)*.58);geom={pad,vw,vh,start,end,x,y:sc.y,min:sc.min,max:sc.max};drawGrid(ctx,w,h,pad,sc);drawRangeContext(ctx);if(layers.killzone)drawKill(ctx,cs,start);if(layers.sessions)drawSessions(ctx);if(layers.support)drawSR(ctx,analysis.sup,'SUPPORT',getComputedStyle(document.documentElement).getPropertyValue('--green'));if(layers.resistance)drawSR(ctx,analysis.res,'RESISTANCE',getComputedStyle(document.documentElement).getPropertyValue('--red'));if(layers.liquidity)drawLiquidity(ctx);if(layers.fvg)drawFVG(ctx);if(layers.ob)drawOB(ctx);if(layers.boll){drawLine(ctx,analysis.bbUp,start,end,x,sc.y,'rgba(245,183,75,.85)',[8,5]);drawLine(ctx,analysis.bbDn,start,end,x,sc.y,'rgba(245,183,75,.85)',[8,5])}if(layers.ema){drawLine(ctx,analysis.e20,start,end,x,sc.y,'#facc15');drawLine(ctx,analysis.e50,start,end,x,sc.y,'#60a5fa');drawLine(ctx,analysis.e200,start,end,x,sc.y,'#a78bfa',[7,4])}if(layers.vwap)drawLine(ctx,analysis.vw,start,end,x,sc.y,'#22d3ee',[4,4]);cs.forEach((c,j)=>{const xx=x(start+j),up=c.c>=c.o,col=up?'#22c55e':'#ef4444';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,sc.y(c.h));ctx.lineTo(xx,sc.y(c.l));ctx.stroke();ctx.fillRect(xx-bw/2,Math.min(sc.y(c.o),sc.y(c.c)),bw,Math.max(1,Math.abs(sc.y(c.o)-sc.y(c.c))))});drawPrice(ctx,analysis.last.c);drawAxis(ctx,w,h,pad,sc,cs,start,x)}
+function drawChart(){if(!analysis)return;const cv=$('chart'),{ctx,w,h}=setupCanvas(cv),pad={l:50,r:96,t:22,b:36},vw=w-pad.l-pad.r,vh=h-pad.t-pad.b,{start,end,cs}=view();ctx.clearRect(0,0,w,h);ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,w,h);const sc=scale(cs,pad,h),x=i=>pad.l+(i-start+.5)*vw/(end-start),bw=Math.max(2,vw/(end-start)*.58);geom={pad,vw,vh,start,end,x,y:sc.y,min:sc.min,max:sc.max};drawGrid(ctx,w,h,pad,sc);drawRangeContext(ctx);if(layers.killzone)drawKill(ctx,cs,start);if(layers.sessions)drawSessions(ctx);if(layers.support)drawSR(ctx,analysis.sup,'SUPPORT',getComputedStyle(document.documentElement).getPropertyValue('--green'));if(layers.resistance)drawSR(ctx,analysis.res,'RESISTANCE',getComputedStyle(document.documentElement).getPropertyValue('--red'));if(layers.liquidity)drawLiquidity(ctx);if(layers.fvg)drawFVG(ctx);if(layers.ob)drawOB(ctx);if(layers.boll){drawLine(ctx,analysis.bbUp,start,end,x,sc.y,'rgba(245,183,75,.85)',[8,5]);drawLine(ctx,analysis.bbDn,start,end,x,sc.y,'rgba(245,183,75,.85)',[8,5])}if(layers.ema){drawLine(ctx,analysis.e20,start,end,x,sc.y,'#facc15');drawLine(ctx,analysis.e50,start,end,x,sc.y,'#60a5fa');drawLine(ctx,analysis.e200,start,end,x,sc.y,'#a78bfa',[7,4])}if(layers.vwap)drawLine(ctx,analysis.vw,start,end,x,sc.y,'#22d3ee',[4,4]);cs.forEach((c,j)=>{const xx=x(start+j),up=c.c>=c.o,col=up?'#22c55e':'#ef4444';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,sc.y(c.h));ctx.lineTo(xx,sc.y(c.l));ctx.stroke();ctx.fillRect(xx-bw/2,Math.min(sc.y(c.o),sc.y(c.c)),bw,Math.max(1,Math.abs(sc.y(c.o)-sc.y(c.c))))});if(layers.signals)drawTradeSignals(ctx);drawPrice(ctx,analysis.last.c);drawAxis(ctx,w,h,pad,sc,cs,start,x)}
 function drawGrid(ctx,w,h,pad,sc){ctx.fillStyle='#eef2f7';ctx.fillRect(w-pad.r,0,pad.r,h);ctx.strokeStyle='rgba(100,116,139,.18)';ctx.fillStyle='rgba(30,41,59,.80)';ctx.font='10px JetBrains Mono';ctx.textAlign='right';ctx.beginPath();ctx.moveTo(w-pad.r,pad.t);ctx.lineTo(w-pad.r,h-pad.b);ctx.stroke();for(let i=0;i<=8;i++){const yy=pad.t+i*(h-pad.t-pad.b)/8;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillText(fmt(sc.max-(sc.max-sc.min)*i/8,2),w-6,yy+3)}for(let i=0;i<=10;i++){const xx=pad.l+i*(w-pad.l-pad.r)/10;ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,h-pad.b);ctx.stroke()}}
 function drawLine(ctx,arr,start,end,x,y,col,dash=[]){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1.35;ctx.setLineDash(dash);ctx.beginPath();let f=true;for(let i=start;i<end;i++){if(!Number.isFinite(arr[i]))continue;if(f){ctx.moveTo(x(i),y(arr[i]));f=false}else ctx.lineTo(x(i),y(arr[i]))}ctx.stroke();ctx.restore()}
-function drawSR(ctx,levels,label,color){levels.slice(0,5).forEach(z=>{const yy=geom.y(z.price);ctx.save();const isSup=label.includes('SUPPORT');ctx.fillStyle=isSup?'rgba(34,197,94,.10)':'rgba(239,68,68,.10)';ctx.strokeStyle=color;ctx.globalAlpha=.86;ctx.setLineDash([8,5]);ctx.fillRect(geom.pad.l,yy-14,geom.vw,28);ctx.beginPath();ctx.moveTo(geom.pad.l,yy);ctx.lineTo(geom.pad.l+geom.vw,yy);ctx.stroke();ctx.setLineDash([]);const tagX=geom.pad.l+geom.vw+4,tagW=geom.pad.r-8;ctx.globalAlpha=1;ctx.fillStyle=isSup?'#16a34a':'#dc2626';ctx.fillRect(tagX,yy-11,tagW,22);ctx.fillStyle='#fff';ctx.font='900 8.5px JetBrains Mono';ctx.textAlign='center';ctx.fillText(`${isSup?'S':'R'} ${fmt(z.price,2)}`,tagX+tagW/2,yy+3);ctx.restore()})}
+function drawSR(ctx,levels,label,color){
+  const used=[];
+  levels.slice(0,5).forEach((z,idx)=>{
+    let yy=geom.y(z.price);
+    let labelY=yy;
+    for(const u of used){if(Math.abs(labelY-u)<18)labelY+=18}
+    used.push(labelY);
+    const isSup=label.includes('SUPPORT');
+    ctx.save();
+    ctx.fillStyle=isSup?'rgba(34,197,94,.10)':'rgba(239,68,68,.10)';
+    ctx.strokeStyle=color;
+    ctx.globalAlpha=.82;
+    ctx.setLineDash([8,5]);
+    ctx.fillRect(geom.pad.l,yy-12,geom.vw,24);
+    ctx.beginPath();
+    ctx.moveTo(geom.pad.l,yy);
+    ctx.lineTo(geom.pad.l+geom.vw,yy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha=1;
+    const text=`${isSup?'SUPPORT':'RESISTANCE'} ${fmt(z.price,2)}`;
+    ctx.font='900 9px JetBrains Mono';
+    const tw=ctx.measureText(text).width+14;
+    const bx=geom.pad.l+6, by=labelY-10;
+    ctx.fillStyle=isSup?'rgba(22,163,74,.92)':'rgba(220,38,38,.92)';
+    ctx.fillRect(bx,by,tw,20);
+    ctx.fillStyle='#fff';
+    ctx.textAlign='left';
+    ctx.fillText(text,bx+7,by+14);
+    if(Math.abs(labelY-yy)>2){
+      ctx.strokeStyle=isSup?'#16a34a':'#dc2626';
+      ctx.beginPath();
+      ctx.moveTo(bx+tw+4,labelY);
+      ctx.lineTo(bx+tw+18,yy);
+      ctx.stroke();
+    }
+    ctx.restore();
+  })
+}
 function drawLiquidity(ctx){[...analysis.res.slice(0,3),...analysis.sup.slice(0,3)].forEach(z=>{const yy=geom.y(z.price);ctx.save();ctx.strokeStyle='rgba(250,204,21,.7)';ctx.setLineDash([2,5]);ctx.beginPath();ctx.moveTo(geom.pad.l,yy);ctx.lineTo(geom.pad.l+geom.vw,yy);ctx.stroke();ctx.restore()})}
 function drawFVG(ctx){analysis.fg.slice(-8).forEach(g=>{if(g.end<geom.start||g.i>geom.end)return;const x1=geom.x(Math.max(g.i,geom.start)),x2=geom.x(Math.min(g.end+30,geom.end-1)),y1=geom.y(g.to),y2=geom.y(g.from);ctx.save();ctx.fillStyle=g.type==='BULL'?'rgba(34,211,238,.16)':'rgba(251,146,60,.16)';ctx.strokeStyle=g.type==='BULL'?'#22d3ee':'#fb923c';ctx.fillRect(x1,Math.min(y1,y2),x2-x1,Math.abs(y2-y1));ctx.strokeRect(x1,Math.min(y1,y2),x2-x1,Math.abs(y2-y1));ctx.fillStyle=ctx.strokeStyle;ctx.font='900 11px JetBrains Mono';ctx.fillText(`FVG ${g.type}`,x1+6,Math.min(y1,y2)+14);ctx.restore()})}
 function drawOB(ctx){analysis.obs.slice(-8).forEach(o=>{if(o.i<geom.start-20||o.i>geom.end)return;const x1=geom.x(Math.max(o.i,geom.start)),x2=geom.x(Math.min(o.i+28,geom.end-1)),y1=geom.y(o.to),y2=geom.y(o.from);ctx.save();ctx.fillStyle='rgba(167,139,250,.16)';ctx.strokeStyle='#a78bfa';ctx.fillRect(x1,Math.min(y1,y2),x2-x1,Math.abs(y2-y1));ctx.strokeRect(x1,Math.min(y1,y2),x2-x1,Math.abs(y2-y1));ctx.fillStyle='#c4b5fd';ctx.font='900 11px JetBrains Mono';ctx.fillText(`OB ${o.type}`,x1+6,Math.min(y1,y2)+14);ctx.restore()})}
+function drawTradeSignals(ctx){
+  if(!analysis||!geom)return;
+  const last=analysis.last;
+  const idx=geom.end-1;
+  const xx=geom.x(idx);
+  let kind=analysis.decision;
+  let reason='Signal';
+  let col='#f59e0b';
+  let arrow='•';
+  if(analysis.trap&&analysis.trap.dir!=='RANGE'){
+    kind=analysis.trap.dir;
+    reason=analysis.trap.dir==='BUY'?'REVERSAL BUY بعد Sweep Low':'REVERSAL SELL بعد Sweep High';
+  }else if(kind==='BUY'){
+    reason='BUY Signal';
+  }else if(kind==='SELL'){
+    reason='SELL Signal';
+  }else{
+    reason=analysis.squeeze?'RANGE / WAIT - تجميع وضغط':'RANGE / WAIT';
+  }
+  if(kind==='BUY'){col='#16a34a';arrow='▲'}
+  else if(kind==='SELL'){col='#dc2626';arrow='▼'}
+  else {col='#f59e0b';arrow='◆'}
+  const y0=kind==='SELL'?geom.y(last.h)-22:kind==='BUY'?geom.y(last.l)+24:geom.y(last.c)-30;
+  ctx.save();
+  ctx.fillStyle=col;
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=2;
+  ctx.font='900 19px JetBrains Mono';
+  ctx.textAlign='center';
+  ctx.fillText(arrow,xx,y0);
+  const text=`${reason} ${analysis.score}%`;
+  ctx.font='900 10px JetBrains Mono';
+  const tw=ctx.measureText(text).width+18;
+  let bx=Math.min(Math.max(xx-tw/2,geom.pad.l+4),geom.pad.l+geom.vw-tw-4);
+  let by=kind==='SELL'?y0-32:y0+8;
+  if(kind==='RANGE')by=geom.pad.t+12;
+  ctx.fillStyle='rgba(255,255,255,.94)';
+  ctx.strokeStyle=col;
+  ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.roundRect(bx,by,tw,24,8);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle=col;
+  ctx.fillText(text,bx+tw/2,by+16);
+  const panelW=230,panelH=58,px=geom.pad.l+10,py=geom.pad.t+10;
+  ctx.fillStyle='rgba(255,255,255,.94)';
+  ctx.strokeStyle=col;
+  ctx.beginPath();
+  ctx.roundRect(px,py,panelW,panelH,12);
+  ctx.fill();
+  ctx.stroke();
+  ctx.textAlign='left';
+  ctx.fillStyle=col;
+  ctx.font='900 12px JetBrains Mono';
+  ctx.fillText(`${kind} ${analysis.score}%`,px+12,py+20);
+  ctx.fillStyle='#334155';
+  ctx.font='800 10px Cairo';
+  const msg=(analysis.trap&&analysis.trap.dir!=='RANGE')?analysis.trap.msg:(analysis.decision==='RANGE'?'لا دخول: انتظر Sweep أو كسر مؤكد':'إشارة تداول من مجموع المدارس');
+  ctx.fillText(msg.slice(0,34),px+12,py+42);
+  ctx.restore();
+}
 function drawRangeContext(ctx){if(!analysis||!geom)return;const show=analysis.squeeze||analysis.trap?.dir!=='RANGE';if(!show)return;const hiY=geom.y(analysis.rangeHigh),loY=geom.y(analysis.rangeLow);ctx.save();ctx.strokeStyle='rgba(245,158,11,.72)';ctx.lineWidth=1.2;ctx.setLineDash([7,5]);[['RH',analysis.rangeHigh,hiY],['RL',analysis.rangeLow,loY]].forEach(([name,price,yy])=>{ctx.beginPath();ctx.moveTo(geom.pad.l,yy);ctx.lineTo(geom.pad.l+geom.vw,yy);ctx.stroke();ctx.fillStyle='rgba(245,158,11,.95)';ctx.font='900 9px JetBrains Mono';ctx.textAlign='right';ctx.fillText(`${name} ${fmt(price,2)}`,geom.pad.l+geom.vw-6,yy-4)});if(analysis.trap?.dir!=='RANGE'){const yy=geom.y(analysis.trap.level),txt=analysis.trap.dir==='BUY'?'SWEEP LOW → BUY':'SWEEP HIGH → SELL';ctx.fillStyle=analysis.trap.dir==='BUY'?'rgba(22,163,74,.92)':'rgba(220,38,38,.92)';ctx.font='900 11px JetBrains Mono';ctx.textAlign='center';ctx.fillText(txt,geom.pad.l+geom.vw*.50,yy+(analysis.trap.dir==='BUY'?18:-10));}ctx.restore()}
 
 function drawKill(ctx,cs,start){cs.forEach((c,j)=>{const h=new Date(c.t).getUTCHours(),inK=(h>=7&&h<10)||(h>=13&&h<16);if(!inK)return;const x1=geom.x(start+j)-geom.vw/(geom.end-geom.start)/2;ctx.fillStyle='rgba(245,183,75,.055)';ctx.fillRect(x1,geom.pad.t,geom.vw/(geom.end-geom.start),geom.vh)})}
 function drawSessions(ctx){analysis.sess.forEach(s=>{[['H',s.hi,s.hiT],['L',s.lo,s.loT]].forEach(([t,p,time])=>{const yy=geom.y(p);ctx.save();ctx.strokeStyle=s.s==='ASIA'?'#22d3ee':s.s==='EU'?'#a78bfa':'#f59e0b';ctx.setLineDash(t==='H'?[8,5]:[3,5]);ctx.beginPath();ctx.moveTo(geom.pad.l,yy);ctx.lineTo(geom.pad.l+geom.vw,yy);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.font='900 10px JetBrains Mono';ctx.textAlign='right';ctx.fillText(`${s.s} ${t} ${fmt(p,2)} ${new Date(time).toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit'})}`,geom.pad.l+geom.vw-5,yy-3);ctx.restore()})})}
-function drawPrice(ctx,p){const yy=geom.y(p),x=geom.pad.l+geom.vw+4,w=geom.pad.r-8;ctx.save();ctx.strokeStyle='rgba(34,197,94,.85)';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(geom.pad.l,yy);ctx.lineTo(geom.pad.l+geom.vw,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#16a34a';ctx.fillRect(x,yy-14,w,28);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='900 9.5px JetBrains Mono';ctx.fillText(fmt(p,2),x+w/2,yy-1);ctx.font='7.5px JetBrains Mono';ctx.fillText(new Date(analysis.last.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),x+w/2,yy+10);ctx.restore()}
+function drawPrice(ctx,p){
+  const yy=geom.y(p),x=geom.pad.l+geom.vw+4,w=geom.pad.r-8;
+  ctx.save();
+  ctx.strokeStyle='rgba(22,163,74,.85)';
+  ctx.setLineDash([2,3]);
+  ctx.beginPath();
+  ctx.moveTo(geom.pad.l,yy);
+  ctx.lineTo(geom.pad.l+geom.vw,yy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#16a34a';
+  ctx.fillRect(x,yy-15,w,30);
+  ctx.fillStyle='#fff';
+  ctx.textAlign='center';
+  ctx.font='900 9.5px JetBrains Mono';
+  ctx.fillText(fmt(p,2),x+w/2,yy-1);
+  ctx.font='7.5px JetBrains Mono';
+  ctx.fillText(new Date(analysis.last.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),x+w/2,yy+10);
+  ctx.restore();
+}
 function drawAxis(ctx,w,h,pad,sc,cs,start,x){ctx.fillStyle='rgba(203,213,225,.7)';ctx.font='10px JetBrains Mono';const step=Math.max(1,Math.floor(cs.length/5));for(let j=0;j<cs.length;j+=step){const i=start+j,d=new Date(candles[i].t),txt=currentTF==='D1'?d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});ctx.fillText(txt,x(i)-18,h-14)}}
 function drawRSI(){const cv=$('rsiCanvas'),{ctx,w,h}=setupCanvas(cv);ctx.clearRect(0,0,w,h);ctx.fillStyle='#eef3f8';ctx.fillRect(0,0,w,h);if(!analysis||!layers.rsi)return;const {start,end}=view(),x=i=>(i-start)*w/(end-start),y=v=>h-(v/100)*h;ctx.strokeStyle='rgba(148,163,184,.18)';[30,50,70].forEach(v=>{ctx.beginPath();ctx.moveTo(0,y(v));ctx.lineTo(w,y(v));ctx.stroke()});drawLine(ctx,analysis.rs,start,end,x,y,'#93c5fd');ctx.fillStyle='var(--muted)';ctx.font='11px JetBrains Mono';ctx.fillText('RSI 14 '+fmt(analysis.rs.at(-1),1),8,15)}
 function drawMACD(){const cv=$('macdCanvas'),{ctx,w,h}=setupCanvas(cv);ctx.clearRect(0,0,w,h);ctx.fillStyle='#eef3f8';ctx.fillRect(0,0,w,h);if(!analysis||!layers.macd)return;const {start,end}=view(),hist=analysis.mc.hist.slice(start,end),mn=Math.min(...hist),mx=Math.max(...hist),x=i=>(i-start)*w/(end-start),y=v=>h-(v-mn)/(mx-mn||1)*h;hist.forEach((v,j)=>{ctx.fillStyle=v>=0?'rgba(34,197,94,.65)':'rgba(239,68,68,.65)';ctx.fillRect(x(start+j),y(Math.max(v,0)),Math.max(1,w/(end-start)*.6),Math.abs(y(v)-y(0)))});ctx.fillStyle='var(--muted)';ctx.font='11px JetBrains Mono';ctx.fillText('MACD Hist '+fmt(hist.at(-1),2),8,15)}
 function zoomIn(){viewCount=clamp(viewCount-25,40,400);drawAll()}function zoomOut(){viewCount=clamp(viewCount+25,40,700);drawAll()}function pan(n){viewOffset=clamp(viewOffset+n,0,Math.max(0,candles.length-viewCount));drawAll()}function resetView(){viewCount=160;viewOffset=0;drawAll()}function toggleFullscreen(){document.body.classList.toggle('fullscreen');setTimeout(drawAll,180)}
-function saveHD(){if(!analysis)return;const out=document.createElement('canvas');out.width=1920;out.height=1080;const ctx=out.getContext('2d');ctx.fillStyle='#07101e';ctx.fillRect(0,0,1920,1080);ctx.fillStyle='#e5ecf6';ctx.font='900 32px Cairo';ctx.textAlign='left';ctx.fillText(`BTC / XAU / XAG PRO LIQUIDITY ENGINE V10.4`,28,42);ctx.font='17px JetBrains Mono';ctx.fillStyle='#22c55e';ctx.fillText(`${symbol} • ${currentTF} • ${fmt(analysis.last.c,2)} • ${new Date(analysis.last.t).toLocaleString('en-GB')} • Eng. Ahmad Nasser 03715512`,28,72);const temp=document.createElement('canvas');temp.style.width='1360px';temp.style.height='720px';document.body.appendChild(temp);const oldChart=$('chart');try{renderToCanvas(temp);ctx.drawImage(temp,28,96,1360,720)}finally{temp.remove();drawAll()}ctx.fillStyle='#0f172a';ctx.fillRect(1410,96,470,720);ctx.strokeStyle='#283449';ctx.strokeRect(1410,96,470,720);ctx.fillStyle='#f5b74b';ctx.font='900 22px Cairo';ctx.textAlign='right';ctx.fillText('نتائج المدارس والتنبيهات',1860,132);let y=168;analysis.schools.forEach(s=>{ctx.fillStyle=s.dir.includes('BULL')?'#22c55e':s.dir.includes('BEAR')?'#ef4444':'#facc15';ctx.font='900 14px JetBrains Mono';ctx.textAlign='left';ctx.fillText(s.dir,1430,y);ctx.fillStyle='#e5ecf6';ctx.textAlign='right';ctx.font='14px Cairo';ctx.fillText(s.name,1860,y);y+=28});ctx.fillStyle='#e5ecf6';ctx.font='13px Cairo';ctx.fillText('دليل: OB BUY/SELL • FVG BULL/BEAR • Support/Resistance • Liquidity • Kill Zone • Sessions H/L',1860,790);const a=document.createElement('a');a.href=out.toDataURL('image/png');a.download=`${symbol}_${currentTF}_V10_HD.png`;a.click()}
+function saveHD(){if(!analysis)return;const out=document.createElement('canvas');out.width=1920;out.height=1080;const ctx=out.getContext('2d');ctx.fillStyle='#07101e';ctx.fillRect(0,0,1920,1080);ctx.fillStyle='#e5ecf6';ctx.font='900 32px Cairo';ctx.textAlign='left';ctx.fillText(`BTC / XAU / XAG PRO LIQUIDITY ENGINE V10.6`,28,42);ctx.font='17px JetBrains Mono';ctx.fillStyle='#22c55e';ctx.fillText(`${symbol} • ${currentTF} • ${fmt(analysis.last.c,2)} • ${new Date(analysis.last.t).toLocaleString('en-GB')} • Eng. Ahmad Nasser 03715512`,28,72);const temp=document.createElement('canvas');temp.style.width='1360px';temp.style.height='720px';document.body.appendChild(temp);const oldChart=$('chart');try{renderToCanvas(temp);ctx.drawImage(temp,28,96,1360,720)}finally{temp.remove();drawAll()}ctx.fillStyle='#0f172a';ctx.fillRect(1410,96,470,720);ctx.strokeStyle='#283449';ctx.strokeRect(1410,96,470,720);ctx.fillStyle='#f5b74b';ctx.font='900 22px Cairo';ctx.textAlign='right';ctx.fillText('نتائج المدارس والتنبيهات',1860,132);let y=168;analysis.schools.forEach(s=>{ctx.fillStyle=s.dir.includes('BULL')?'#22c55e':s.dir.includes('BEAR')?'#ef4444':'#facc15';ctx.font='900 14px JetBrains Mono';ctx.textAlign='left';ctx.fillText(s.dir,1430,y);ctx.fillStyle='#e5ecf6';ctx.textAlign='right';ctx.font='14px Cairo';ctx.fillText(s.name,1860,y);y+=28});ctx.fillStyle='#e5ecf6';ctx.font='13px Cairo';ctx.fillText('دليل: OB BUY/SELL • FVG BULL/BEAR • Support/Resistance • Liquidity • Kill Zone • Sessions H/L',1860,790);const a=document.createElement('a');a.href=out.toDataURL('image/png');a.download=`${symbol}_${currentTF}_V10_HD.png`;a.click()}
 function renderToCanvas(temp){const original=$('chart');temp.parentElement||document.body.appendChild(temp);const oldId=temp.id;temp.id='exportChart';const save=document.getElementById('chart');temp.style.display='block';const r={getBoundingClientRect:()=>({width:1360,height:720})};Object.defineProperty(temp,'parentElement',{value:r,configurable:true});renderChartOn(temp);temp.id=oldId}
 function renderChartOn(canvas){const old=$('chart');canvas.id='chart';drawChart();canvas.id='exportChart'}
 function saveCurrentSignal(){if(!analysis||analysis.decision==='RANGE'){notify('لا توجد إشارة BUY/SELL مؤكدة للحفظ. الحالة الحالية عرضية.');return}const rec={id:Date.now(),symbol,tf:currentTF,time:analysis.last.t,dir:analysis.decision,entry:analysis.entry,sl:analysis.sl,tp:analysis.tp,score:analysis.score,schools:analysis.schools,status:'OPEN',reason:smartAlertText(analysis).replace(/<[^>]+>/g,'')};journal.push(rec);localStorage.setItem('v10_journal',JSON.stringify(journal));notify('تم حفظ الإشارة ومتابعتها.');updateJournalStats()}
@@ -417,6 +539,13 @@ function openBacktest(){
   if($('btTo')&&!$('btTo').value)$('btTo').value=to.toISOString().slice(0,10);
   $('backtestModal').classList.add('open')
 }function closeBacktest(){$('backtestModal').classList.remove('open')}
+
+function candlesFromLoadedChart(from,to){
+  let fromTs=new Date(from+'T00:00:00').getTime(), toTs=new Date(to+'T23:59:59').getTime();
+  if(fromTs>toTs){const tmp=fromTs;fromTs=toTs;toTs=tmp}
+  return (candles||[]).filter(c=>c.t>=fromTs&&c.t<=toTs);
+}
+
 async function runBacktest(){
   let from=$('btFrom').value,to=$('btTo').value,tf=$('btTf').value;
   $('backtestResult').textContent='Loading real MetaAPI candles...';
@@ -425,23 +554,49 @@ async function runBacktest(){
     let fTs=new Date(from+'T00:00:00').getTime(), tTs=new Date(to+'T23:59:59').getTime();
     let swapped=false;
     if(fTs>tTs){swapped=true; const tmp=from; from=to; to=tmp;}
-    const cs=await fetchRangeCandles(symbol,tf,from,to,8000);
-    const minNeed=tf==='4h'?30:tf==='1h'?50:80;
+    let cs=[];
+    let sourceUsed='historical MetaAPI range';
+    let rangeErr='';
+    try{
+      cs=await fetchRangeCandles(symbol,tf,from,to,8000);
+    }catch(err){
+      rangeErr=err.message||String(err);
+      cs=[];
+    }
+    const minNeed=tf==='4h'?24:tf==='1h'?40:tf==='30m'?55:70;
     if(cs.length<minNeed){
-      throw new Error(`Not enough candles returned from MetaAPI for this period.
+      const loaded=candlesFromLoadedChart(from,to);
+      if(loaded.length>=Math.min(35,minNeed)){
+        sourceUsed='loaded chart candles fallback';
+        cs=loaded;
+      }
+    }
+    if(cs.length<Math.min(35,minNeed)){
+      const debug=(window.__btDebug||[]).slice(-5).join('\n');
+      throw new Error(`Not enough candles for this period.
 Symbol: ${symbol}
 TF: ${tf}
 From: ${from}
 To: ${to}
-Returned candles: ${cs.length}
-Minimum needed: ${minNeed}
+Historical candles: ${cs.length}
+Minimum needed: ${Math.min(35,minNeed)}
 
-الحل: جرّب فترة أطول، أو تأكد أن الرمز متاح عند البروكر، أو أن السوق كان مفتوحًا في هذه الفترة.`);
+What to do:
+1) تأكد أنك تستخدم الرمز الصحيح الموجود عند البروكر، مثل XAUUSD أو XAUUSD. أو GOLD.
+2) افتح الشارت على نفس الرمز والفريم وانتظر تحميل الشموع، ثم أعد Backtest.
+3) جرّب فترة أقرب أو أطول.
+4) جرّب الرابط المباشر:
+   /api/metaapi-candles?symbol=${symbol}&timeframe=${tf}&limit=20&startTime=${new Date(from+'T00:00:00').toISOString()}
+
+Range error: ${rangeErr||'none'}
+Debug:
+${debug||'no debug'}`);
     }
     let wins=0,loss=0,trades=0,open=0;
     const stepJump=tf==='5m'?8:tf==='15m'?5:tf==='30m'?4:2;
     const forward=tf==='5m'?70:tf==='15m'?50:tf==='30m'?40:30;
-    for(let i=Math.max(70,minNeed);i<cs.length-20;i+=stepJump){
+    const startI=Math.min(Math.max(45,Math.floor(cs.length*.18)),Math.max(20,cs.length-25));
+    for(let i=startI;i<cs.length-12;i+=stepJump){
       const a=analyze(cs.slice(0,i));
       if(!a||a.decision==='RANGE')continue;
       trades++;
@@ -455,11 +610,13 @@ Minimum needed: ${minNeed}
       if(res==='WIN')wins++; else if(res==='LOSS')loss++; else open++;
     }
     const wr=(wins+loss)?wins/(wins+loss)*100:0;
+    const debug=(window.__btDebug||[]).slice(-3).join('\n');
     $('backtestResult').textContent=`Symbol: ${symbol}
 TF: ${tf}
 From: ${from}
 To: ${to}
 Dates swapped automatically: ${swapped?'YES':'NO'}
+Source used: ${sourceUsed}
 Candles: ${cs.length}
 First candle: ${cs[0]?new Date(cs[0].t).toLocaleString('en-GB'):'---'}
 Last candle: ${cs.at(-1)?new Date(cs.at(-1).t).toLocaleString('en-GB'):'---'}
@@ -470,7 +627,10 @@ Losses: ${loss}
 Open/no hit: ${open}
 Win rate closed: ${fmt(wr,1)}%
 
-ملاحظة: الاختبار يعتمد على شموع MetaAPI فقط، ولا يوجد Demo.`;
+Debug:
+${debug}
+
+ملاحظة: لا يوجد Demo. إذا استخدم fallback فهو يستخدم شموع MetaAPI المحمّلة فعلًا في الشارت.`;
   }catch(e){
     $('backtestResult').textContent='ERROR:\n'+(e.message||e);
   }

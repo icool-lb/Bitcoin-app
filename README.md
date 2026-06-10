@@ -1,20 +1,14 @@
-# BTC / XAU / XAG Pro Liquidity Engine V10.4
+# BTC / XAU / XAG Pro Liquidity Engine V10.6
 
 No demo fallback.
 
-V10.4 changes:
-- Stronger Range / Consolidation / Sweep Trap logic.
-- Adds Sweep Trap school with BUY / SELL / RANGE and score.
-- Draws range high / range low context and sweep trap labels.
-- MT5-style right price axis: current price tag is inside the right axis strip, not over the candles.
-- Support and Resistance show price tags on the right axis strip.
+V10.6:
+- Backtest now first tries historical MetaAPI range.
+- If the historical range returns 0 candles, it can use the real loaded chart candles as fallback.
+- Backtest result shows the source used and debug batches.
+- Useful when broker/MetaAPI historical startTime endpoint behaves differently but the live chart is already loaded.
 
-Required Vercel variables:
+Required:
 METAAPI_TOKEN
 METAAPI_ACCOUNT_ID
 METAAPI_REGION
-
-Optional:
-ECONOMIC_CALENDAR_URL
-TELEGRAM_BOT_TOKEN
-TELEGRAM_CHAT_ID
