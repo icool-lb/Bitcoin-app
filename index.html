@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#0b1220"/>
-<title>BTC / XAU / XAG Pro Liquidity Engine V10.6</title>
+<title>BTC / XAU / XAG Pro Liquidity Engine V10.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -113,6 +113,14 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
 
 /* V10.5 clean price axis + visible signal labels */
 .signalBadge{font-weight:900}
+/* V10.7 live price and file backtest */
+.fileHint{font-size:11px;color:#64748b;margin:4px 0 8px;text-align:right}
+#btFile{max-width:260px}
+.livePulse{animation:pulseLive .8s ease-out}
+@keyframes pulseLive{0%{transform:scale(1.03);filter:brightness(1.1)}100%{transform:scale(1);filter:none}}
+
+/* V10.8 quote endpoint */
+.quoteTiny{font-size:10px;color:#64748b}
 </style>
 </head>
 <body>
@@ -121,8 +129,8 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
   <div class="brand">
     <div class="brandIcon"><span id="brandIcons">₿ 🥇 🥈</span></div>
     <div>
-      <h1>BTC / XAU / XAG <b>PRO LIQUIDITY ENGINE V10.6</b></h1>
-      <p>MetaAPI Safe Mode • No Demo • Backtest Live Fallback Desk</p>
+      <h1>BTC / XAU / XAG <b>PRO LIQUIDITY ENGINE V10.8</b></h1>
+      <p>MetaAPI Safe Mode • No Demo • Quote Endpoint Live Desk</p>
       <small>تصميم وبرمجة المهندس أحمد ناصر — 03715512</small>
     </div>
   </div>
@@ -251,13 +259,16 @@ body{background:linear-gradient(180deg,#f8fafc,#e7ebf0);color:var(--text)}
   <div class="modalBox">
     <div class="modalHead"><h2>Backtest حقيقي من MetaAPI</h2><button class="btn" onclick="closeBacktest()">إغلاق</button></div>
     <p style="color:var(--muted);font-size:12px;margin-bottom:10px">لا يوجد Demo. الاختبار يعتمد على شموع MetaAPI فقط. اختر التواريخ والفريم.</p>
-    <div class="btHint">اختر الفترة بوضوح. إذا لم يرجع MetaAPI شموعًا تاريخية، سيستخدم النظام الشموع الحقيقية المحمّلة في الشارت كخطة احتياطية.</div>
+    <div class="btHint">للباك تست سنة كاملة: ارفع ملف CSV أو JSON فيه شموع 15 دقيقة. الأعمدة المطلوبة: time, open, high, low, close, volume.</div>
     <div class="btRow">
       <div class="btField"><label>FROM</label><input class="input" type="date" id="btFrom"></div>
       <div class="btField"><label>TO</label><input class="input" type="date" id="btTo"></div>
       <div class="btField"><label>TF</label><select class="input" id="btTf"><option>5m</option><option selected>15m</option><option>30m</option><option>1h</option><option>4h</option></select></div>
+      <div class="btField"><label>CANDLE FILE</label><input class="input" type="file" id="btFile" accept=".csv,.json,.txt"></div>
       <button class="btn gold" onclick="runBacktest()">Run Backtest</button>
+      <button class="btn" onclick="exportBacktestExcel()">Export Excel</button>
     </div>
+    <div class="fileHint">إذا رفعت ملفًا، يتم تجاهل MetaAPI في الباك تست ويستخدم الملف فقط، بدون Demo.</div>
     <pre id="backtestResult" style="white-space:pre-wrap;color:#dbeafe;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:180px"></pre>
   </div>
 </div>
@@ -274,8 +285,9 @@ const TF={M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'4h',D1:'1d'};
 let symbol=localStorage.getItem('v10_symbol')||'BTCUSD';
 let currentTF=localStorage.getItem('v10_tf')||'M15';
 let endpoint=localStorage.getItem('v10_endpoint')||'/api/metaapi-candles';
+let priceEndpoint=localStorage.getItem('v10_price_endpoint')||'/api/metaapi-price';
 let dxySymbol=localStorage.getItem('v10_dxy')||'DXY';
-let candles=[], analysis=null, viewCount=160, viewOffset=0, geom=null, apiOK=false, newsList=[], lastNewsAlert={};
+let candles=[], analysis=null, viewCount=160, viewOffset=0, geom=null, apiOK=false, newsList=[], lastNewsAlert={}, lastQuote=null, priceTimer=null;
 let audioAlerts=localStorage.getItem('v10_audio')!=='0';
 let layers={support:true,resistance:true,liquidity:true,killzone:true,sessions:true,signals:true,fvg:true,ob:true,boll:true,ema:true,vwap:true,rsi:true,macd:true};
 let journal=JSON.parse(localStorage.getItem('v10_journal')||'[]');
@@ -367,7 +379,7 @@ function analyze(cs){if(cs.length<80)return null;const closes=cs.map(c=>c.c),las
 }
 function setStatus(id,st,msg){const e=$(id);e.className='status '+(st==='ok'?'live':st==='err'?'err':st==='temp'?'temp':'warn');e.textContent=msg}
 async function loadMain(){setStatus('apiStatus','warn','METAAPI CHECK');try{candles=await fetchCandles(symbol,currentTF,700);apiOK=true;setStatus('apiStatus','ok','METAAPI LIVE');$('noData').classList.remove('show');analysis=analyze(candles);updateUI();drawAll();evaluateJournal()}catch(e){apiOK=false;const msg=e.message||String(e);setStatus('apiStatus',msg.includes('TEMPORARY')||msg.includes('RATE LIMIT')?'temp':'err',msg.includes('TEMPORARY')?'METAAPI TEMP':msg.includes('RATE LIMIT')?'METAAPI LIMIT':'METAAPI ERROR');$('noData').classList.add('show');$('noDataText').textContent=msg;$('livePrice').textContent='NO DATA';}}
-function updateUI(){if(!analysis)return;const a=analysis,inf=assetInfo(symbol);$('assetIcon').textContent=inf.icon;$('assetSelect').value=symbol;$('livePrice').textContent=(symbol.startsWith('BTC')?'$':'')+fmt(a.last.c,2);$('bidLbl').textContent='LAST CLOSE '+fmt(a.last.c,2);$('askLbl').textContent='META CANDLES';$('spreadLbl').textContent='SPREAD RAW '+fmt(a.last.spread||0,1);$('masterScore').textContent=a.score;$('scoreBar').style.width=a.score+'%';$('decision').textContent=a.decision;$('decision').className='decision '+(a.decision==='BUY'?'buy':a.decision==='SELL'?'sell':'wait');$('signalType').textContent=a.decision;$('confidence').textContent=a.score+'%';$('atrVal').textContent=fmt(a.atrLast,2);$('rrVal').textContent=a.sl?fmt(Math.abs(a.tp-a.entry)/Math.abs(a.entry-a.sl),2):'---';$('entryVal').textContent=fmt(a.entry,2);$('slVal').textContent=a.sl?fmt(a.sl,2):'---';$('tpVal').textContent=a.tp?fmt(a.tp,2):'---';$('zoneBox').textContent=a.trap&&a.trap.dir!=='RANGE'?('Sweep '+a.trap.dir):a.nearSup<1?'منطقة شرائية':a.nearRes<1?'منطقة بيعية':a.squeeze?'تجميع / ضغط':'منتصف النطاق';$('planDecision').textContent=a.decision;$('breakoutProb').textContent=fmt(Math.abs(a.score-50)*2,0)+'%';$('schoolsBox').innerHTML=a.schools.map(s=>`<div class="school"><span>${s.name}<small style="display:block;color:var(--muted);font-size:9px">${s.why||''}</small></span><span class="tag ${s.dir==='BUY'?'bull':s.dir==='SELL'?'bear':'neutral'}">${s.dir} ${s.num}</span></div>`).join('');$('smartAlert').innerHTML=smartAlertText(a);$('audioBtn').textContent=audioAlerts?'الصوت ON':'الصوت OFF';updateJournalStats()}
+function updateUI(){if(!analysis)return;const a=analysis,inf=assetInfo(symbol);$('assetIcon').textContent=inf.icon;$('assetSelect').value=symbol;const displayPrice=lastQuote?((lastQuote.bid+lastQuote.ask)/2):a.last.c;$('livePrice').textContent=(symbol.startsWith('BTC')?'$':'')+fmt(displayPrice,2);if(lastQuote){$('bidLbl').textContent='BID '+fmt(lastQuote.bid,2);$('askLbl').textContent='ASK '+fmt(lastQuote.ask,2);$('spreadLbl').textContent='SPR '+fmt(lastQuote.spread,2)+' • '+(lastQuote.brokerTime||'');}else{$('bidLbl').textContent='LAST CLOSE '+fmt(a.last.c,2);$('askLbl').textContent='META CANDLES';$('spreadLbl').textContent='SPREAD RAW '+fmt(a.last.spread||0,1);}$('masterScore').textContent=a.score;$('scoreBar').style.width=a.score+'%';$('decision').textContent=a.decision;$('decision').className='decision '+(a.decision==='BUY'?'buy':a.decision==='SELL'?'sell':'wait');$('signalType').textContent=a.decision;$('confidence').textContent=a.score+'%';$('atrVal').textContent=fmt(a.atrLast,2);$('rrVal').textContent=a.sl?fmt(Math.abs(a.tp-a.entry)/Math.abs(a.entry-a.sl),2):'---';$('entryVal').textContent=fmt(a.entry,2);$('slVal').textContent=a.sl?fmt(a.sl,2):'---';$('tpVal').textContent=a.tp?fmt(a.tp,2):'---';$('zoneBox').textContent=a.trap&&a.trap.dir!=='RANGE'?('Sweep '+a.trap.dir):a.nearSup<1?'منطقة شرائية':a.nearRes<1?'منطقة بيعية':a.squeeze?'تجميع / ضغط':'منتصف النطاق';$('planDecision').textContent=a.decision;$('breakoutProb').textContent=fmt(Math.abs(a.score-50)*2,0)+'%';$('schoolsBox').innerHTML=a.schools.map(s=>`<div class="school"><span>${s.name}<small style="display:block;color:var(--muted);font-size:9px">${s.why||''}</small></span><span class="tag ${s.dir==='BUY'?'bull':s.dir==='SELL'?'bear':'neutral'}">${s.dir} ${s.num}</span></div>`).join('');$('smartAlert').innerHTML=smartAlertText(a);$('audioBtn').textContent=audioAlerts?'الصوت ON':'الصوت OFF';updateJournalStats()}
 function smartAlertText(a){
   if(a.trap&&a.trap.dir!=='RANGE'){
     return `<b class="${a.trap.dir==='BUY'?'bull':'bear'}">${a.trap.dir}</b> Sweep Trap ${a.trap.score}%<br>${a.trap.msg}<br>Level ${fmt(a.trap.level,2)} • TP ${fmt(a.tp,2)} / SL ${fmt(a.sl,2)}`;
@@ -523,7 +535,7 @@ function drawAxis(ctx,w,h,pad,sc,cs,start,x){ctx.fillStyle='rgba(203,213,225,.7)
 function drawRSI(){const cv=$('rsiCanvas'),{ctx,w,h}=setupCanvas(cv);ctx.clearRect(0,0,w,h);ctx.fillStyle='#eef3f8';ctx.fillRect(0,0,w,h);if(!analysis||!layers.rsi)return;const {start,end}=view(),x=i=>(i-start)*w/(end-start),y=v=>h-(v/100)*h;ctx.strokeStyle='rgba(148,163,184,.18)';[30,50,70].forEach(v=>{ctx.beginPath();ctx.moveTo(0,y(v));ctx.lineTo(w,y(v));ctx.stroke()});drawLine(ctx,analysis.rs,start,end,x,y,'#93c5fd');ctx.fillStyle='var(--muted)';ctx.font='11px JetBrains Mono';ctx.fillText('RSI 14 '+fmt(analysis.rs.at(-1),1),8,15)}
 function drawMACD(){const cv=$('macdCanvas'),{ctx,w,h}=setupCanvas(cv);ctx.clearRect(0,0,w,h);ctx.fillStyle='#eef3f8';ctx.fillRect(0,0,w,h);if(!analysis||!layers.macd)return;const {start,end}=view(),hist=analysis.mc.hist.slice(start,end),mn=Math.min(...hist),mx=Math.max(...hist),x=i=>(i-start)*w/(end-start),y=v=>h-(v-mn)/(mx-mn||1)*h;hist.forEach((v,j)=>{ctx.fillStyle=v>=0?'rgba(34,197,94,.65)':'rgba(239,68,68,.65)';ctx.fillRect(x(start+j),y(Math.max(v,0)),Math.max(1,w/(end-start)*.6),Math.abs(y(v)-y(0)))});ctx.fillStyle='var(--muted)';ctx.font='11px JetBrains Mono';ctx.fillText('MACD Hist '+fmt(hist.at(-1),2),8,15)}
 function zoomIn(){viewCount=clamp(viewCount-25,40,400);drawAll()}function zoomOut(){viewCount=clamp(viewCount+25,40,700);drawAll()}function pan(n){viewOffset=clamp(viewOffset+n,0,Math.max(0,candles.length-viewCount));drawAll()}function resetView(){viewCount=160;viewOffset=0;drawAll()}function toggleFullscreen(){document.body.classList.toggle('fullscreen');setTimeout(drawAll,180)}
-function saveHD(){if(!analysis)return;const out=document.createElement('canvas');out.width=1920;out.height=1080;const ctx=out.getContext('2d');ctx.fillStyle='#07101e';ctx.fillRect(0,0,1920,1080);ctx.fillStyle='#e5ecf6';ctx.font='900 32px Cairo';ctx.textAlign='left';ctx.fillText(`BTC / XAU / XAG PRO LIQUIDITY ENGINE V10.6`,28,42);ctx.font='17px JetBrains Mono';ctx.fillStyle='#22c55e';ctx.fillText(`${symbol} • ${currentTF} • ${fmt(analysis.last.c,2)} • ${new Date(analysis.last.t).toLocaleString('en-GB')} • Eng. Ahmad Nasser 03715512`,28,72);const temp=document.createElement('canvas');temp.style.width='1360px';temp.style.height='720px';document.body.appendChild(temp);const oldChart=$('chart');try{renderToCanvas(temp);ctx.drawImage(temp,28,96,1360,720)}finally{temp.remove();drawAll()}ctx.fillStyle='#0f172a';ctx.fillRect(1410,96,470,720);ctx.strokeStyle='#283449';ctx.strokeRect(1410,96,470,720);ctx.fillStyle='#f5b74b';ctx.font='900 22px Cairo';ctx.textAlign='right';ctx.fillText('نتائج المدارس والتنبيهات',1860,132);let y=168;analysis.schools.forEach(s=>{ctx.fillStyle=s.dir.includes('BULL')?'#22c55e':s.dir.includes('BEAR')?'#ef4444':'#facc15';ctx.font='900 14px JetBrains Mono';ctx.textAlign='left';ctx.fillText(s.dir,1430,y);ctx.fillStyle='#e5ecf6';ctx.textAlign='right';ctx.font='14px Cairo';ctx.fillText(s.name,1860,y);y+=28});ctx.fillStyle='#e5ecf6';ctx.font='13px Cairo';ctx.fillText('دليل: OB BUY/SELL • FVG BULL/BEAR • Support/Resistance • Liquidity • Kill Zone • Sessions H/L',1860,790);const a=document.createElement('a');a.href=out.toDataURL('image/png');a.download=`${symbol}_${currentTF}_V10_HD.png`;a.click()}
+function saveHD(){if(!analysis)return;const out=document.createElement('canvas');out.width=1920;out.height=1080;const ctx=out.getContext('2d');ctx.fillStyle='#07101e';ctx.fillRect(0,0,1920,1080);ctx.fillStyle='#e5ecf6';ctx.font='900 32px Cairo';ctx.textAlign='left';ctx.fillText(`BTC / XAU / XAG PRO LIQUIDITY ENGINE V10.8`,28,42);ctx.font='17px JetBrains Mono';ctx.fillStyle='#22c55e';ctx.fillText(`${symbol} • ${currentTF} • ${fmt(analysis.last.c,2)} • ${new Date(analysis.last.t).toLocaleString('en-GB')} • Eng. Ahmad Nasser 03715512`,28,72);const temp=document.createElement('canvas');temp.style.width='1360px';temp.style.height='720px';document.body.appendChild(temp);const oldChart=$('chart');try{renderToCanvas(temp);ctx.drawImage(temp,28,96,1360,720)}finally{temp.remove();drawAll()}ctx.fillStyle='#0f172a';ctx.fillRect(1410,96,470,720);ctx.strokeStyle='#283449';ctx.strokeRect(1410,96,470,720);ctx.fillStyle='#f5b74b';ctx.font='900 22px Cairo';ctx.textAlign='right';ctx.fillText('نتائج المدارس والتنبيهات',1860,132);let y=168;analysis.schools.forEach(s=>{ctx.fillStyle=s.dir.includes('BULL')?'#22c55e':s.dir.includes('BEAR')?'#ef4444':'#facc15';ctx.font='900 14px JetBrains Mono';ctx.textAlign='left';ctx.fillText(s.dir,1430,y);ctx.fillStyle='#e5ecf6';ctx.textAlign='right';ctx.font='14px Cairo';ctx.fillText(s.name,1860,y);y+=28});ctx.fillStyle='#e5ecf6';ctx.font='13px Cairo';ctx.fillText('دليل: OB BUY/SELL • FVG BULL/BEAR • Support/Resistance • Liquidity • Kill Zone • Sessions H/L',1860,790);const a=document.createElement('a');a.href=out.toDataURL('image/png');a.download=`${symbol}_${currentTF}_V10_HD.png`;a.click()}
 function renderToCanvas(temp){const original=$('chart');temp.parentElement||document.body.appendChild(temp);const oldId=temp.id;temp.id='exportChart';const save=document.getElementById('chart');temp.style.display='block';const r={getBoundingClientRect:()=>({width:1360,height:720})};Object.defineProperty(temp,'parentElement',{value:r,configurable:true});renderChartOn(temp);temp.id=oldId}
 function renderChartOn(canvas){const old=$('chart');canvas.id='chart';drawChart();canvas.id='exportChart'}
 function saveCurrentSignal(){if(!analysis||analysis.decision==='RANGE'){notify('لا توجد إشارة BUY/SELL مؤكدة للحفظ. الحالة الحالية عرضية.');return}const rec={id:Date.now(),symbol,tf:currentTF,time:analysis.last.t,dir:analysis.decision,entry:analysis.entry,sl:analysis.sl,tp:analysis.tp,score:analysis.score,schools:analysis.schools,status:'OPEN',reason:smartAlertText(analysis).replace(/<[^>]+>/g,'')};journal.push(rec);localStorage.setItem('v10_journal',JSON.stringify(journal));notify('تم حفظ الإشارة ومتابعتها.');updateJournalStats()}
@@ -540,6 +552,86 @@ function openBacktest(){
   $('backtestModal').classList.add('open')
 }function closeBacktest(){$('backtestModal').classList.remove('open')}
 
+
+function parseNum(v){if(v===undefined||v===null)return NaN;return Number(String(v).replace(/,/g,'').trim())}
+function parseCsvLine(line){
+  const out=[];let cur='',q=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'&&line[i+1]==='"'){cur+='"';i++;continue}
+    if(ch==='"'){q=!q;continue}
+    if(ch===','&&!q){out.push(cur);cur='';continue}
+    cur+=ch;
+  }
+  out.push(cur);return out;
+}
+function normalizeFileCandle(row){
+  const get=(...ks)=>{for(const k of ks){if(row[k]!==undefined)return row[k];const kk=Object.keys(row).find(x=>x.toLowerCase().trim()===String(k).toLowerCase());if(kk)return row[kk]}};
+  const tRaw=get('time','Time','date','Date','datetime','Datetime','timestamp','Timestamp','brokerTime');
+  let t=Number(tRaw);
+  if(!Number.isFinite(t)||String(tRaw).length<10)t=Date.parse(String(tRaw).replace(' ','T'));
+  if(Number.isFinite(t)&&t<10000000000)t*=1000;
+  return {t,o:parseNum(get('open','Open','OPEN','o')),h:parseNum(get('high','High','HIGH','h')),l:parseNum(get('low','Low','LOW','l')),c:parseNum(get('close','Close','CLOSE','c')),v:parseNum(get('volume','Volume','tickVolume','TickVolume','VOL','v'))||0,state:'complete'};
+}
+async function readBacktestFile(){
+  const inp=$('btFile');
+  if(!inp||!inp.files||!inp.files[0])return null;
+  const file=inp.files[0];
+  const text=await file.text();
+  let rows=[];
+  if(file.name.toLowerCase().endsWith('.json')||text.trim().startsWith('[')||text.trim().startsWith('{')){
+    const j=JSON.parse(text);
+    rows=Array.isArray(j)?j:(j.candles||j.data||[]);
+  }else{
+    const lines=text.split(/\r?\n/).filter(x=>x.trim());
+    const headers=parseCsvLine(lines.shift()).map(h=>h.trim());
+    rows=lines.map(line=>{const vals=parseCsvLine(line);const o={};headers.forEach((h,i)=>o[h]=vals[i]);return o});
+  }
+  const cs=rows.map(normalizeFileCandle).filter(c=>Number.isFinite(c.t)&&Number.isFinite(c.o)&&Number.isFinite(c.h)&&Number.isFinite(c.l)&&Number.isFinite(c.c)).sort((a,b)=>a.t-b.t);
+  if(!cs.length)throw new Error('File has no valid candles. Required columns: time, open, high, low, close, volume.');
+  return {candles:cs,fileName:file.name};
+}
+let lastLivePriceTs=0;
+async function refreshLivePrice(){
+  try{
+    const q=new URLSearchParams({symbol,keepSubscription:'true'});
+    const r=await fetch(`${priceEndpoint}?${q.toString()}`,{cache:'no-store'});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok)throw new Error(j?.detail||j?.error||'quote price failed');
+    if(!Number.isFinite(Number(j.bid))||!Number.isFinite(Number(j.ask)))throw new Error('quote returned no bid/ask');
+    lastQuote={symbol:j.symbol||symbol,bid:Number(j.bid),ask:Number(j.ask),time:j.time||'',brokerTime:j.brokerTime||'',spread:Number(j.spread ?? (Number(j.ask)-Number(j.bid)))};
+    const mid=(lastQuote.bid+lastQuote.ask)/2;
+    lastLivePriceTs=Date.now();
+    if(analysis){
+      analysis.last.c=mid;
+      analysis.last.h=Math.max(analysis.last.h,mid);
+      analysis.last.l=Math.min(analysis.last.l,mid);
+      if(j.time)analysis.last.t=Date.parse(j.time)||analysis.last.t;
+      $('livePrice').textContent=(symbol.startsWith('BTC')?'$':'')+fmt(mid,2);
+      $('bidLbl').textContent='BID '+fmt(lastQuote.bid,2);
+      $('askLbl').textContent='ASK '+fmt(lastQuote.ask,2);
+      $('spreadLbl').textContent='SPR '+fmt(lastQuote.spread,2)+(lastQuote.brokerTime?' • '+lastQuote.brokerTime:'');
+      $('livePrice').classList.remove('livePulse'); void $('livePrice').offsetWidth; $('livePrice').classList.add('livePulse');
+      setStatus('apiStatus','ok','METAAPI QUOTE');
+      drawAll();
+    }
+  }catch(e){
+    // no demo fallback; keep last real candle/quote visible
+    const msg=e.message||String(e);
+    setStatus('apiStatus',msg.includes('429')?'temp':'warn','QUOTE CHECK');
+  }
+}
+function exportBacktestExcel(){
+  const trades=window.__btTrades||[];
+  if(!trades.length){alert('لا توجد صفقات لتصديرها. شغّل Backtest أولًا.');return}
+  const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let html='<html><head><meta charset="utf-8"></head><body><table border="1"><tr><th>#</th><th>Symbol</th><th>TF</th><th>Time</th><th>Direction</th><th>Entry</th><th>SL</th><th>TP</th><th>Score</th><th>Result</th><th>Exit Time</th><th>Exit Price</th><th>Reason</th></tr>';
+  trades.forEach((t,i)=>{html+=`<tr><td>${i+1}</td><td>${esc(t.symbol)}</td><td>${esc(t.tf)}</td><td>${esc(t.time)}</td><td>${esc(t.dir)}</td><td>${t.entry}</td><td>${t.sl}</td><td>${t.tp}</td><td>${t.score}</td><td>${esc(t.result)}</td><td>${esc(t.exitTime)}</td><td>${t.exitPrice??''}</td><td>${esc(t.reason)}</td></tr>`});
+  html+='</table></body></html>';
+  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`backtest_${symbol}_${currentTF}_${new Date().toISOString().slice(0,10)}.xls`;a.click();
+}
+
 function candlesFromLoadedChart(from,to){
   let fromTs=new Date(from+'T00:00:00').getTime(), toTs=new Date(to+'T23:59:59').getTime();
   if(fromTs>toTs){const tmp=fromTs;fromTs=toTs;toTs=tmp}
@@ -548,78 +640,61 @@ function candlesFromLoadedChart(from,to){
 
 async function runBacktest(){
   let from=$('btFrom').value,to=$('btTo').value,tf=$('btTf').value;
-  $('backtestResult').textContent='Loading real MetaAPI candles...';
+  window.__btTrades=[];
+  $('backtestResult').textContent='Loading candles...';
   try{
-    if(!from||!to)throw new Error('اختر FROM و TO أولًا.');
-    let fTs=new Date(from+'T00:00:00').getTime(), tTs=new Date(to+'T23:59:59').getTime();
-    let swapped=false;
-    if(fTs>tTs){swapped=true; const tmp=from; from=to; to=tmp;}
-    let cs=[];
-    let sourceUsed='historical MetaAPI range';
-    let rangeErr='';
-    try{
-      cs=await fetchRangeCandles(symbol,tf,from,to,8000);
-    }catch(err){
-      rangeErr=err.message||String(err);
-      cs=[];
-    }
-    const minNeed=tf==='4h'?24:tf==='1h'?40:tf==='30m'?55:70;
-    if(cs.length<minNeed){
-      const loaded=candlesFromLoadedChart(from,to);
-      if(loaded.length>=Math.min(35,minNeed)){
-        sourceUsed='loaded chart candles fallback';
-        cs=loaded;
+    let filePack=await readBacktestFile();
+    let cs=[],sourceUsed='';
+    if(filePack){
+      cs=filePack.candles;
+      sourceUsed='uploaded candle file: '+filePack.fileName;
+      if(from||to){
+        let fTs=from?new Date(from+'T00:00:00').getTime():-Infinity;
+        let tTs=to?new Date(to+'T23:59:59').getTime():Infinity;
+        if(fTs>tTs){const tmp=fTs;fTs=tTs;tTs=tmp}
+        cs=cs.filter(c=>c.t>=fTs&&c.t<=tTs);
       }
+    }else{
+      if(!from||!to)throw new Error('اختر FROM و TO أو ارفع ملف شموع.');
+      let fTs=new Date(from+'T00:00:00').getTime(), tTs=new Date(to+'T23:59:59').getTime();
+      if(fTs>tTs){const tmp=from; from=to; to=tmp;}
+      sourceUsed='historical MetaAPI range';
+      try{cs=await fetchRangeCandles(symbol,tf,from,to,8000)}catch(e){cs=[]}
+      const loaded=candlesFromLoadedChart(from,to);
+      if(cs.length<50 && loaded.length>cs.length){sourceUsed='loaded chart candles fallback';cs=loaded}
     }
-    if(cs.length<Math.min(35,minNeed)){
-      const debug=(window.__btDebug||[]).slice(-5).join('\n');
-      throw new Error(`Not enough candles for this period.
-Symbol: ${symbol}
-TF: ${tf}
-From: ${from}
-To: ${to}
-Historical candles: ${cs.length}
-Minimum needed: ${Math.min(35,minNeed)}
+    const minNeed=60;
+    if(cs.length<minNeed)throw new Error(`Not enough candles.
+Source: ${sourceUsed}
+Returned candles: ${cs.length}
+Minimum needed: ${minNeed}
 
-What to do:
-1) تأكد أنك تستخدم الرمز الصحيح الموجود عند البروكر، مثل XAUUSD أو XAUUSD. أو GOLD.
-2) افتح الشارت على نفس الرمز والفريم وانتظر تحميل الشموع، ثم أعد Backtest.
-3) جرّب فترة أقرب أو أطول.
-4) جرّب الرابط المباشر:
-   /api/metaapi-candles?symbol=${symbol}&timeframe=${tf}&limit=20&startTime=${new Date(from+'T00:00:00').toISOString()}
-
-Range error: ${rangeErr||'none'}
-Debug:
-${debug||'no debug'}`);
-    }
+للباك تست سنة كاملة ارفع ملف CSV/JSON فيه شموع 15 دقيقة.`);
     let wins=0,loss=0,trades=0,open=0;
     const stepJump=tf==='5m'?8:tf==='15m'?5:tf==='30m'?4:2;
     const forward=tf==='5m'?70:tf==='15m'?50:tf==='30m'?40:30;
-    const startI=Math.min(Math.max(45,Math.floor(cs.length*.18)),Math.max(20,cs.length-25));
+    const startI=Math.min(Math.max(80,Math.floor(cs.length*.04)),Math.max(20,cs.length-25));
     for(let i=startI;i<cs.length-12;i+=stepJump){
       const a=analyze(cs.slice(0,i));
       if(!a||a.decision==='RANGE')continue;
       trades++;
-      let res='OPEN';
+      let res='OPEN',exitPrice='',exitTime='';
       for(let j=i+1;j<Math.min(cs.length,i+forward);j++){
-        if(a.decision==='BUY'&&cs[j].l<=a.sl){res='LOSS';break}
-        if(a.decision==='BUY'&&cs[j].h>=a.tp){res='WIN';break}
-        if(a.decision==='SELL'&&cs[j].h>=a.sl){res='LOSS';break}
-        if(a.decision==='SELL'&&cs[j].l<=a.tp){res='WIN';break}
+        if(a.decision==='BUY'&&cs[j].l<=a.sl){res='LOSS';exitPrice=a.sl;exitTime=cs[j].t;break}
+        if(a.decision==='BUY'&&cs[j].h>=a.tp){res='WIN';exitPrice=a.tp;exitTime=cs[j].t;break}
+        if(a.decision==='SELL'&&cs[j].h>=a.sl){res='LOSS';exitPrice=a.sl;exitTime=cs[j].t;break}
+        if(a.decision==='SELL'&&cs[j].l<=a.tp){res='WIN';exitPrice=a.tp;exitTime=cs[j].t;break}
       }
       if(res==='WIN')wins++; else if(res==='LOSS')loss++; else open++;
+      window.__btTrades.push({symbol,tf,time:new Date(cs[i-1].t).toLocaleString('en-GB'),dir:a.decision,entry:fmt(a.entry,2),sl:fmt(a.sl,2),tp:fmt(a.tp,2),score:a.score,result:res,exitTime:exitTime?new Date(exitTime).toLocaleString('en-GB'):'',exitPrice:exitPrice?fmt(exitPrice,2):'',reason:(a.trap&&a.trap.dir!=='RANGE')?a.trap.msg:a.schools.map(s=>`${s.name}:${s.dir}${s.num}`).join(' | ')});
     }
     const wr=(wins+loss)?wins/(wins+loss)*100:0;
-    const debug=(window.__btDebug||[]).slice(-3).join('\n');
     $('backtestResult').textContent=`Symbol: ${symbol}
 TF: ${tf}
-From: ${from}
-To: ${to}
-Dates swapped automatically: ${swapped?'YES':'NO'}
 Source used: ${sourceUsed}
 Candles: ${cs.length}
-First candle: ${cs[0]?new Date(cs[0].t).toLocaleString('en-GB'):'---'}
-Last candle: ${cs.at(-1)?new Date(cs.at(-1).t).toLocaleString('en-GB'):'---'}
+First candle: ${new Date(cs[0].t).toLocaleString('en-GB')}
+Last candle: ${new Date(cs.at(-1).t).toLocaleString('en-GB')}
 
 Trades: ${trades}
 Wins: ${wins}
@@ -627,10 +702,7 @@ Losses: ${loss}
 Open/no hit: ${open}
 Win rate closed: ${fmt(wr,1)}%
 
-Debug:
-${debug}
-
-ملاحظة: لا يوجد Demo. إذا استخدم fallback فهو يستخدم شموع MetaAPI المحمّلة فعلًا في الشارت.`;
+تم تجهيز تفاصيل الصفقات. اضغط Export Excel لتنزيل الملف.`;
   }catch(e){
     $('backtestResult').textContent='ERROR:\n'+(e.message||e);
   }
@@ -640,8 +712,18 @@ function renderNews(){if(!newsList.length){$('newsBox').innerHTML='<div class="n
 function checkNewsAlerts(){const now=Date.now();newsList.forEach(n=>{const t=Date.parse(n.time||n.date||'');if(!Number.isFinite(t))return;const diff=t-now;if(diff>0&&diff<30*60*1000&&!lastNewsAlert[n.id||n.title]){lastNewsAlert[n.id||n.title]=true;notify(`خبر اقتصادي مهم بعد أقل من نصف ساعة: ${n.title||n.event}. التأثير: ${n.impact||'غير محدد'}`)}})}
 async function loadXagDxy(){try{const x=await fetchCandles('XAGUSD',currentTF,8);$('xagTable').innerHTML='<tr><th>Time</th><th>O</th><th>C</th><th>Dir</th></tr>'+x.slice(-5).map(c=>`<tr><td>${new Date(c.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</td><td>${fmt(c.o,2)}</td><td>${fmt(c.c,2)}</td><td class="${c.c>=c.o?'bull':'bear'}">${c.c>=c.o?'↑':'↓'}</td></tr>`).join('')}catch(e){$('xagTable').innerHTML='<tr><td>NO XAG DATA</td></tr>'}try{const d=await fetchCandles(dxySymbol,'15m',80);const last=d.at(-1),first=d.at(-20);$('dxyLast').textContent=fmt(last.c,2);$('dxyDir').textContent=last.c>first.c?'صاعد ↑':'هابط ↓';$('dxyDir').className=last.c>first.c?'bull':'bear'}catch(e){$('dxyDir').textContent='NO DATA';$('dxyLast').textContent='---'}}
 function loadAllSide(){loadNews();loadXagDxy()}
-document.querySelectorAll('.tfBtn').forEach(b=>b.onclick=()=>{currentTF=b.dataset.tf;localStorage.setItem('v10_tf',currentTF);document.querySelectorAll('.tfBtn').forEach(x=>x.classList.toggle('active',x.dataset.tf===currentTF));loadMain();loadXagDxy()});
-function init(){const info=assetInfo(symbol);$('assetSelect').value=symbol;$('assetIcon').textContent=info.icon;$('endpointInput').value=endpoint;$('dxySymbol').value=dxySymbol;document.querySelectorAll('.tfBtn').forEach(x=>x.classList.toggle('active',x.dataset.tf===currentTF));loadMain();loadAllSide();setInterval(loadMain,10000);setInterval(loadNews,5*60*1000);setInterval(loadXagDxy,30000)}
+document.querySelectorAll('.tfBtn').forEach(b=>b.onclick=()=>{currentTF=b.dataset.tf;lastQuote=null;localStorage.setItem('v10_tf',currentTF);document.querySelectorAll('.tfBtn').forEach(x=>x.classList.toggle('active',x.dataset.tf===currentTF));loadMain();loadXagDxy()});
+function init(){
+  const info=assetInfo(symbol);
+  $('assetSelect').value=symbol;$('assetIcon').textContent=info.icon;$('endpointInput').value=endpoint;$('dxySymbol').value=dxySymbol;
+  document.querySelectorAll('.tfBtn').forEach(x=>x.classList.toggle('active',x.dataset.tf===currentTF));
+  loadMain().then(()=>refreshLivePrice()).catch(()=>refreshLivePrice());
+  loadAllSide();
+  priceTimer=setInterval(refreshLivePrice,2000);
+  setInterval(loadMain,30000);
+  setInterval(loadNews,5*60*1000);
+  setInterval(loadXagDxy,30000)
+}
 init();
 </script>
 </body>

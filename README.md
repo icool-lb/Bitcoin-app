@@ -1,15 +1,22 @@
-# BTC / XAU / XAG Pro Liquidity Engine V10.7
+# BTC / XAU / XAG Pro Liquidity Engine V10.8
 
 No demo fallback.
 
-V10.7:
-- Live price refresh every 3 seconds using latest real MetaAPI candle including current forming candle.
-- Full chart refresh every 30 seconds to avoid API pressure.
-- Backtest can read uploaded CSV/JSON candle files.
-- Backtest exports Excel-compatible .xls file with every trade and reason.
-- Required candle columns: time, open, high, low, close, volume or tickVolume.
+V10.8:
+- Adds /api/metaapi-price live quote endpoint.
+- Uses MetaAPI current-price endpoint for real bid/ask.
+- Frontend updates live price every 2 seconds.
+- Candles/chart update every 30 seconds.
+- The quote endpoint uses keepSubscription=true for faster subsequent updates.
+- If quote fails, the system keeps last real value and shows QUOTE CHECK; no demo price is used.
 
-Required:
+Required Vercel variables:
 METAAPI_TOKEN
 METAAPI_ACCOUNT_ID
 METAAPI_REGION
+
+Optional:
+METAAPI_CLIENT_HOST
+ECONOMIC_CALENDAR_URL
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
